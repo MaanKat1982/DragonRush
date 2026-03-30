@@ -108,11 +108,59 @@ resize();
 
 function getSkyGradient() {
     let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    if (timeMode === "night") { grad.addColorStop(0, "#050510"); grad.addColorStop(1, "#1a1a2e"); }
-    else if (timeMode === "sunrise") { grad.addColorStop(0, "#ff9a9e"); grad.addColorStop(1, "#fad0c4"); }
-    else if (timeMode === "sunset") { grad.addColorStop(0, "#2c3e50"); grad.addColorStop(1, "#fd746c"); }
-    else { grad.addColorStop(0, "#16213e"); grad.addColorStop(1, "#0f3460"); }
+    if (timeMode === "night") { 
+        grad.addColorStop(0, "#050510"); grad.addColorStop(1, "#1a1a2e"); 
+    }
+    else if (timeMode === "sunrise") { 
+        grad.addColorStop(0, "#ff9a9e"); grad.addColorStop(1, "#fad0c4"); 
+    }
+    else if (timeMode === "sunset") { 
+        grad.addColorStop(0, "#2c3e50"); grad.addColorStop(1, "#fd746c"); 
+    }
+    else { 
+        // AANGEPAST: Lichtere, frissere blauwe lucht voor overdag
+        grad.addColorStop(0, "#87CEEB"); grad.addColorStop(1, "#E0F7FA"); 
+    }
     return grad;
+}
+
+function drawMoon(x, y, radius) {
+    // AANGEPAST: Dynamische maanfase op basis van de dag van de maand
+    const day = new Date().getDate();
+    const phase = (day % 30) / 30; // 0 tot 1 cyclus
+
+    ctx.save();
+    ctx.translate(x, y);
+    
+    // Donkere 'schaduw' van de maan
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+    ctx.fill();
+
+    // Verlicht gedeelte
+    ctx.beginPath();
+    for (let i = 0; i <= 180; i++) {
+        const angle = (i - 90) * (Math.PI / 180);
+        const xPos = Math.cos(angle) * radius;
+        const yPos = Math.sin(angle) * radius;
+        const illumination = Math.cos(2 * Math.PI * phase);
+        const cpX = xPos * illumination;
+        if (i === 0) ctx.moveTo(cpX, yPos);
+        else ctx.lineTo(cpX, yPos);
+    }
+    for (let i = 180; i >= 0; i--) {
+        const angle = (i - 90) * (Math.PI / 180);
+        const xPos = Math.cos(angle) * radius;
+        const yPos = Math.sin(angle) * radius;
+        ctx.lineTo(xPos, yPos);
+    }
+
+    ctx.fillStyle = "#f5f3ce";
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "white";
+    ctx.fill();
+    ctx.restore();
 }
 
 function updateWordUI() {
@@ -284,8 +332,9 @@ function draw() {
     if (timeMode === "night" || timeMode === "sunset") {
         ctx.fillStyle = "white";
         stars.forEach(s => { s.x -= 0.2; if(s.x<0) s.x = canvas.width; ctx.fillRect(s.x, s.y, s.s, s.s); });
-        ctx.beginPath(); ctx.arc(canvas.width - 100, 80, 40, 0, 7); ctx.fillStyle = "#f5f3ce"; ctx.fill();
-        ctx.beginPath(); ctx.arc(canvas.width - 80, 80, 40, 0, 7); ctx.fillStyle = (timeMode === "night") ? "#050510" : "#2c3e50"; ctx.fill();
+        
+        // AANGEPAST: De nieuwe dynamische maan functie aanroepen
+        drawMoon(canvas.width - 100, 80, 35);
     }
     if (timeMode === "day" || timeMode === "sunrise") {
         ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
