@@ -12,43 +12,43 @@
         
         #ui { position: absolute; top: 10px; left: 10px; color: white; pointer-events: none; z-index: 10; font-size: 14px; width: 95%; text-shadow: 1px 1px 2px black; }
         #wordDisplay { font-size: 24px; font-weight: bold; margin-bottom: 5px; letter-spacing: 5px; }
-        .letter-off { color: rgba(255,255,255,0.15); }
-        .letter-on { color: #f9ed69; text-shadow: 0 0 15px #f9ed69; }
+        .letter-off { color: rgba(255,255,255,0.2); }
+        .letter-on { color: #f9ed69; text-shadow: 0 0 10px #f9ed69; }
         
-        #bossMeterContainer { width: 150px; height: 10px; background: rgba(255,255,255,0.1); border: 1px solid white; margin-top: 5px; border-radius: 5px; overflow: hidden; }
-        #bossMeterFill { height: 100%; width: 0%; background: #ff4500; }
+        #bossMeterContainer { width: 150px; height: 12px; background: rgba(255,255,255,0.2); border: 2px solid white; margin-top: 5px; border-radius: 5px; }
+        #bossMeterFill { height: 100%; width: 0%; background: #ff4500; transition: width 0.2s; }
         
-        .btn { position: absolute; bottom: 25px; width: 85px; height: 85px; background: rgba(255, 255, 255, 0.2); border: 4px solid white; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; z-index: 20; user-select: none; font-size: 12px; }
-        #jumpBtn { left: 25px; }
-        #fireBtn { right: 25px; border-color: #ff4500; color: #ff4500; }
+        .btn { position: absolute; bottom: 20px; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.2); border: 3px solid white; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; z-index: 20; user-select: none; }
+        #jumpBtn { left: 20px; }
+        #fireBtn { right: 20px; border-color: #ff4500; color: #ff4500; }
         
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 20px; }
-        h1 { color: #00ff41; text-shadow: 0 0 15px #00ff41; margin: 0; }
-        button { padding: 12px 35px; font-size: 20px; cursor: pointer; background: #00ff41; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; font-family: inherit; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 20px; }
+        h1 { color: #00ff41; text-shadow: 0 0 10px #00ff41; font-size: 2.2em; margin: 0; }
+        button { padding: 10px 25px; font-size: 18px; cursor: pointer; background: #00ff41; border: none; border-radius: 5px; font-weight: bold; margin-top: 15px; font-family: inherit; }
     </style>
 </head>
 <body>
-    <div id="landscapeMsg"><h2>🔄 Draai je telefoon!</h2><p>Dragon Rush speel je liggend.</p></div>
+    <div id="landscapeMsg"><h2>🔄 Draai je telefoon!</h2><p>Speel in landscape modus.</p></div>
 
     <div id="startScreen" class="overlay">
         <h1>DRAGON RUSH</h1>
-        <h3 style="margin: 5px 0;">Jip & Noah Edition</h3>
-        <p id="timeGreeting" style="color: #00e5ff; font-weight: bold;"></p>
+        <h3>by Jip & Noah</h3>
+        <p>Pak alle letters van <b>MAARTEN</b> voor Onsterfelijkheid!</p>
         <button id="realStartBtn">START</button>
     </div>
 
     <div id="gameOverScreen" class="overlay" style="display: none;">
         <h1>GAME OVER</h1>
-        <p style="font-size: 24px;">Score: <span id="finalScore" style="color:#00ff41;">0</span></p>
+        <p>Score: <span id="finalScore">0</span></p>
         <button id="retryBtn">OPNIEUW</button>
     </div>
 
     <div id="ui">
         <div id="wordDisplay"></div>
-        <div>Score: <span id="score">0</span></div>
-        <span>Boss Afstand:</span>
+        <strong>Jip & Noah</strong> | Score: <span id="score">0</span><br>
+        <span id="bossLabel">Boss Afstand:</span>
         <div id="bossMeterContainer"><div id="bossMeterFill"></div></div>
-        <div id="statusLabel" style="margin-top:5px; font-weight:bold; color:#00ff41;">Draak</div>
+        <span id="statusLabel" style="font-weight:bold; color:#00ff41;">Draak</span>
     </div>
     
     <div id="jumpBtn" class="btn">SPRONG</div>
@@ -59,8 +59,7 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score'), bossMeterFill = document.getElementById('bossMeterFill');
-const finalScoreElement = document.getElementById('finalScore'), statusLabel = document.getElementById('statusLabel');
-const wordDisplay = document.getElementById('wordDisplay');
+const statusLabel = document.getElementById('statusLabel'), wordDisplay = document.getElementById('wordDisplay');
 
 const targetWord = "MAARTEN";
 const bossThreshold = 800;
@@ -70,10 +69,7 @@ let speedMult, bulletSize, isDino, powerUpTimer, hasLaser, gameLevel, nextBossSc
 let dragon, obstacles, fruits, flames, bossFlames, boss, letterItems;
 let collectedLetters = [], immortalTimer = 0;
 
-function resize() { 
-    canvas.width = window.innerWidth; 
-    canvas.height = window.innerHeight; 
-}
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 window.addEventListener('resize', resize);
 resize();
 
@@ -83,122 +79,141 @@ function updateWordUI() {
     ).join('');
 }
 
+function drawPlayer(x, y, size, dino) {
+    ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
+    ctx.fillStyle = (immortalTimer > 0) ? `hsl(${frame * 10}, 100%, 50%)` : (dino ? "#8B4513" : "#00ff41");
+    if (dino) {
+        ctx.fillRect(10, 5, 25, 20); ctx.fillRect(10, 22, 10, 15); ctx.fillRect(-10, 25, 25, 10); // T-Rex
+        ctx.fillStyle = "white"; ctx.fillRect(28, 8, 4, 4);
+    } else {
+        ctx.fillRect(5, 10, 25, 15); ctx.fillRect(20, 2, 18, 12); // Draak lichaam + kop
+        ctx.fillStyle = (immortalTimer > 0) ? "white" : "#008f11";
+        ctx.fillRect(0, 5, 15, 10); ctx.fillStyle = "white"; ctx.fillRect(30, 5, 4, 4); // Oog
+    }
+    ctx.restore();
+}
+
+function drawHydra(x, y) {
+    ctx.save(); ctx.translate(x, y); ctx.fillStyle = "#a349a4"; ctx.fillRect(20, 60, 60, 50);
+    for (let i = 0; i < 3; i++) {
+        let ox = i * 28; let oy = Math.sin(frame * 0.1 + i) * 12;
+        ctx.fillRect(ox, 20 + oy, 15, 45); ctx.fillRect(ox - 5, 10 + oy, 30, 18);
+        ctx.fillStyle = "yellow"; ctx.fillRect(ox + 15, 15 + oy, 5, 5);
+    }
+    ctx.restore();
+}
+
 function initVariables() {
     score = 0; gameActive = true; frame = 0; shakeAmount = 0;
     speedMult = 1; bulletSize = 1; isDino = false; powerUpTimer = 0; hasLaser = false; gameLevel = 1;
     nextBossScore = bossThreshold;
-    dragon = { x: 80, y: 0, w: 45, h: 50, dy: 0, grav: 0.6, grounded: false, size: 1, jumpCount: 0, maxJumps: 3 };
-    obstacles = []; fruits = []; flames = []; bossFlames = []; 
-    letterItems = []; collectedLetters = []; immortalTimer = 0;
-    boss = { active: false, x: canvas.width - 160, y: 50, w: 130, h: 130, hp: 30, maxHp: 30, dir: 1 };
+    dragon = { x: 60, y: 0, w: 40, h: 45, dy: 0, grav: 0.5, grounded: false, size: 1, jumpCount: 0, maxJumps: 3 };
+    obstacles = []; fruits = []; flames = []; bossFlames = []; letterItems = []; 
+    collectedLetters = []; immortalTimer = 0;
+    boss = { active: false, x: canvas.width - 150, y: 50, w: 120, h: 120, hp: 30, maxHp: 30, dir: 1 };
     updateWordUI();
 }
 
-function handleJump() { if (gameActive && dragon.jumpCount < dragon.maxJumps) { dragon.dy = isDino ? -14 : -12; dragon.jumpCount++; dragon.grounded = false; } }
+function handleJump() { if (gameActive && dragon.jumpCount < dragon.maxJumps) { dragon.dy = isDino ? -13 : -11; dragon.jumpCount++; dragon.grounded = false; } }
 function handleFire() {
     if (!gameActive) return;
-    if (hasLaser && isDino) { flames.push({ x: dragon.x + 50, y: dragon.y + 15, w: canvas.width, h: 30, type: 'laser', life: 15 }); }
-    else if (dragon.size > 0.4 || isDino) { flames.push({ x: dragon.x + 50, y: dragon.y + 25, r: 12 * bulletSize, type: 'ball' }); if (!isDino) dragon.size -= 0.04; }
+    if (hasLaser && isDino) { flames.push({ x: dragon.x + 45, y: dragon.y + 15, w: canvas.width, h: 25, type: 'laser', life: 12 }); shakeAmount = 10; }
+    else if (dragon.size > 0.4 || isDino) { flames.push({ x: dragon.x + 40, y: dragon.y + 20, r: 10 * bulletSize, type: 'ball' }); if (!isDino) dragon.size -= 0.04; }
 }
 
 window.onkeydown = (e) => { if(e.code === 'Space') handleJump(); if(e.code === 'KeyF') handleFire(); };
-document.getElementById('jumpBtn').onclick = handleJump;
-document.getElementById('fireBtn').onclick = handleFire;
+document.getElementById('jumpBtn').ontouchstart = (e) => { e.preventDefault(); handleJump(); };
+document.getElementById('fireBtn').ontouchstart = (e) => { e.preventDefault(); handleFire(); };
 
 function applyFruit(type) {
-    let oldDino = isDino; 
-    speedMult = 1; bulletSize = 1; isDino = false; hasLaser = false; dragon.size = 1;
-    isDino = oldDino;
-    if (type === 'speed') speedMult = 1.8;
-    if (type === 'big') { if(isDino) hasLaser = true; else bulletSize = 3; }
-    if (type === 'dino') { isDino = true; statusLabel.innerText = "T-REX MODE"; powerUpTimer = 9999; return; }
-    if (type === 'slow') speedMult = 0.5;
+    let oldDino = isDino; resetPowerUps(); isDino = oldDino;
+    if (type === 'speed') { speedMult = 1.7; statusLabel.innerText = "Snelheid!"; }
+    else if (type === 'big') { if(isDino) hasLaser = true; else bulletSize = 3; statusLabel.innerText = "Mega Vuur!"; }
+    else if (type === 'dino') { isDino = true; statusLabel.innerText = "T-REX MODE"; powerUpTimer = 9999; return; }
+    else if (type === 'slow') { speedMult = 0.5; statusLabel.innerText = "Slow-mo"; }
     powerUpTimer = 400;
 }
+
+function resetPowerUps() { speedMult = 1; bulletSize = 1; isDino = false; hasLaser = false; dragon.size = 1; statusLabel.innerText = "Draak"; }
 
 function update() {
     if (!gameActive) return;
     frame++;
     if (frame % 60 === 0) score += (speedMult > 1) ? 2 : 1;
-    if (powerUpTimer > 0) { powerUpTimer--; if (powerUpTimer === 0) { speedMult = 1; bulletSize = 1; isDino = false; statusLabel.innerText = "Draak"; } }
+    if (powerUpTimer > 0) { powerUpTimer--; if (powerUpTimer === 0) resetPowerUps(); }
     if (immortalTimer > 0) { immortalTimer--; if (immortalTimer === 0) { collectedLetters = []; updateWordUI(); statusLabel.innerText = "Draak"; } }
 
     let ground = canvas.height - 50;
     dragon.dy += dragon.grav; dragon.y += dragon.dy;
     if (dragon.y + dragon.h > ground) { dragon.y = ground - dragon.h; dragon.dy = 0; dragon.grounded = true; dragon.jumpCount = 0; }
 
-    if (!boss.active) {
-        let progress = ((score % bossThreshold) / bossThreshold) * 100;
-        bossMeterFill.style.width = progress + "%";
-        if (score >= nextBossScore) { boss.active = true; boss.hp = 30 + (gameLevel * 10); boss.maxHp = boss.hp; nextBossScore += bossThreshold; obstacles = []; shakeAmount = 25; }
-    } else {
+    if (boss.active) {
         bossMeterFill.style.width = (boss.hp / boss.maxHp * 100) + "%";
-        boss.y += (4 * boss.dir); if (boss.y < 30 || boss.y > ground - 170) boss.dir *= -1;
-        if (frame % 50 === 0) bossFlames.push({ x: boss.x, y: boss.y + 60, r: 15, vx: -10 });
+        boss.y += (4 * boss.dir); if (boss.y < 20 || boss.y > ground - 160) boss.dir *= -1;
+        if (frame % 60 === 0) bossFlames.push({ x: boss.x, y: boss.y+50, r: 15, vx: -10 });
+    } else {
+        bossMeterFill.style.width = ((score % bossThreshold) / bossThreshold * 100) + "%";
+        if (score >= nextBossScore) { boss.active = true; boss.hp = 30 * gameLevel; boss.maxHp = boss.hp; nextBossScore += bossThreshold; obstacles = []; shakeAmount = 20; }
     }
 
-    let moveSpeed = 8 * speedMult;
-    if (!boss.active && frame % 70 === 0) obstacles.push({ x: canvas.width, y: ground - 50, w: 40, h: 50 });
+    let moveSpeed = (7 + gameLevel) * speedMult;
+    if (!boss.active && frame % 80 === 0) obstacles.push({ x: canvas.width, y: ground - 45, w: 35, h: 45 });
 
     obstacles.forEach((o, i) => { o.x -= moveSpeed; if (checkHit(dragon, o)) { if (immortalTimer > 0 || isDino) obstacles.splice(i,1); else gameOver(); } });
-    
-    if (frame % 150 === 0) {
-        let types = ['speed', 'big', 'dino', 'slow'];
-        fruits.push({ x: canvas.width, y: ground - 150, type: types[Math.floor(Math.random()*types.length)] });
+
+    if (frame % 120 === 0) {
+        let types = [{c:'cyan',t:'speed'},{c:'orange',t:'big'},{c:'purple',t:'dino'},{c:'white',t:'slow'}];
+        let p = types[Math.floor(Math.random()*types.length)];
+        fruits.push({ x: canvas.width, y: ground - 120, type: p.t, color: p.c });
     }
     fruits.forEach((f, i) => { f.x -= moveSpeed; if (checkHit(dragon, {x:f.x, y:f.y, w:25, h:25})) { applyFruit(f.type); fruits.splice(i,1); } });
 
     flames.forEach((fl, fi) => {
-        fl.x += 15;
-        if (boss.active && fl.x > boss.x && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1.5; flames.splice(fi,1); if(boss.hp <= 0) { boss.active = false; score += 500; gameLevel++; } }
-        obstacles.forEach((o, oi) => { if (fl.x > o.x && fl.x < o.x + o.w && fl.y > o.y) { obstacles.splice(oi,1); flames.splice(fi,1); }});
+        if (fl.type === 'ball') {
+            fl.x += 12;
+            if (boss.active && fl.x > boss.x && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1; flames.splice(fi,1); if(boss.hp <= 0) { boss.active = false; score += 300; gameLevel++; } }
+            obstacles.forEach((o, oi) => { if (fl.x > o.x && fl.x < o.x + o.w && fl.y > o.y) { obstacles.splice(oi,1); flames.splice(fi,1); }});
+        } else { fl.life--; if (boss.active && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 0.5; if(boss.hp <= 0) { boss.active = false; score += 300; gameLevel++; } } if (fl.life <= 0) flames.splice(fi,1); }
     });
 
     if (frame % 300 === 0 && collectedLetters.length < 7) {
         let needed = []; for(let i=0; i<7; i++) if(!collectedLetters.includes(i)) needed.push(i);
         let idx = needed[Math.floor(Math.random()*needed.length)];
-        letterItems.push({ x: canvas.width, y: 150+Math.random()*150, char: targetWord[idx], idx });
+        letterItems.push({ x: canvas.width, y: 100+Math.random()*200, char: targetWord[idx], idx });
     }
     letterItems.forEach((l, i) => {
         l.x -= moveSpeed;
         if (checkHit(dragon, {x:l.x, y:l.y-20, w:30, h:30})) {
             if(!collectedLetters.includes(l.idx)) collectedLetters.push(l.idx);
             letterItems.splice(i, 1); updateWordUI();
-            if(collectedLetters.length === 7) { immortalTimer = 1200; statusLabel.innerText = "ONSTERFELIJK!"; }
+            if(collectedLetters.length === 7) { immortalTimer = 1200; statusLabel.innerText = "MAARTEN MODUS!"; }
         }
     });
+    bossFlames.forEach((bf, i) => { bf.x += bf.vx; if (checkHit(dragon, {x: bf.x-10, y: bf.y-10, w: 20, h: 20})) { if (immortalTimer > 0 || isDino) bossFlames.splice(i,1); else gameOver(); } });
     scoreElement.innerText = score;
 }
 
-function checkHit(d, o) { return d.x < o.x + (o.w||25) && d.x + (d.w*d.size) > o.x && d.y < o.y + (o.h||25) && d.y + (d.h*d.size) > o.y; }
+function checkHit(d, o) { let dW = d.w * d.size, dH = d.h * d.size; return d.x < o.x + (o.w||25) && d.x + dW > o.x && d.y < o.y + (o.h||25) && d.y + dH > o.y; }
 
 function draw() {
     ctx.fillStyle = "#1a1a2e"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
     ctx.save();
     if (shakeAmount > 0) { ctx.translate(Math.random()*shakeAmount, Math.random()*shakeAmount); shakeAmount *= 0.9; }
     
-    // ONDERGROND
-    ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+    ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 50, canvas.width, 50); // Grond
+    drawPlayer(dragon.x, dragon.y, dragon.size, isDino);
+    if (boss.active) drawHydra(boss.x, boss.y);
     
-    // DRAAK
-    ctx.fillStyle = (immortalTimer > 0) ? "gold" : (isDino ? "#8B4513" : "#00ff41");
-    ctx.fillRect(dragon.x, dragon.y, dragon.w * dragon.size, dragon.h * dragon.size);
-    
-    // BAAS
-    if (boss.active) { ctx.fillStyle = "#a349a4"; ctx.fillRect(boss.x, boss.y, boss.w, boss.h); }
-    
-    // OBJECTEN
     ctx.fillStyle = "#ff2e63"; obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.w, o.h));
-    ctx.fillStyle = "cyan"; fruits.forEach(f => ctx.fillRect(f.x, f.y, 20, 20));
-    ctx.fillStyle = "white"; flames.forEach(fl => ctx.fillRect(fl.x, fl.y, 10, 10));
-    ctx.fillStyle = "red"; bossFlames.forEach(bf => ctx.fillRect(bf.x, bf.y, 20, 20));
+    fruits.forEach(f => { ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(f.x+15, f.y+15, 12, 0, 7); ctx.fill(); });
+    ctx.fillStyle = "white"; flames.forEach(fl => { if(fl.type=='ball') { ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r, 0, 7); ctx.fill(); } else { ctx.fillStyle="cyan"; ctx.fillRect(fl.x, fl.y, fl.w, fl.h); } });
+    ctx.fillStyle = "red"; bossFlames.forEach(bf => { ctx.beginPath(); ctx.arc(bf.x, bf.y, bf.r, 0, 7); ctx.fill(); });
     ctx.fillStyle = "gold"; letterItems.forEach(l => { ctx.font = "bold 30px Courier"; ctx.fillText(l.char, l.x, l.y); });
     
     ctx.restore();
 }
 
-function gameOver() { gameActive = false; finalScoreElement.innerText = score; document.getElementById('gameOverScreen').style.display='flex'; }
+function gameOver() { gameActive = false; document.getElementById('finalScore').innerText = score; document.getElementById('gameOverScreen').style.display='flex'; }
 function startGame() { document.getElementById('startScreen').style.display='none'; document.getElementById('gameOverScreen').style.display='none'; initVariables(); loop(); }
 
 document.getElementById('realStartBtn').onclick = startGame;
