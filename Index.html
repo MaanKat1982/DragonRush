@@ -43,7 +43,7 @@
             🔵 <b>Cyaan:</b> Snelheid + 2x Score | 🟠 <b>Oranje:</b> Laser (als Dino)<br>
             🟣 <b>Paars:</b> T-Rex Mode (Extra leven) | ⚪ <b>Wit:</b> Slow motion<br>
             🌈 <b>Regenboog:</b> +100 PTN | 🟢 <b>Groen:</b> <b>GIFTIG!</b><br>
-            ✨ <b>Woord "MAARTEN":</b> Onsterfelijkheid!
+            ✨ <b>Woord "MAARTEN":</b> Onsterfelijkheid & Disco!
         </div>
         <button id="realStartBtn">START GAME</button>
     </div>
@@ -80,7 +80,6 @@ const bossMeterFill = document.getElementById('bossMeterFill'), finalScoreElemen
 const statusLabel = document.getElementById('statusLabel'), highScoreList = document.getElementById('highScoreList');
 const wordDisplay = document.getElementById('wordDisplay'), initialsInput = document.getElementById('initialsInput');
 
-// TIME & THEME LOGIC
 const hour = new Date().getHours();
 let timeMode = "day";
 let greeting = "Klaar voor de start?";
@@ -109,6 +108,12 @@ window.addEventListener('resize', resize);
 resize();
 
 function getSkyGradient() {
+    if (immortalTimer > 0) {
+        let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, `hsl(${(frame*5)%360}, 70%, 20%)`);
+        grad.addColorStop(1, "#000");
+        return grad;
+    }
     let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
     if (timeMode === "night") { grad.addColorStop(0, "#020205"); grad.addColorStop(1, "#0f0c29"); }
     else if (timeMode === "sunrise") { grad.addColorStop(0, "#ff5f6d"); grad.addColorStop(1, "#ffc371"); }
@@ -122,19 +127,13 @@ function drawMoon(x, y, radius) {
     const phase = (day % 30) / 30; 
     ctx.save();
     ctx.translate(x, y);
-    
-    // Moon Glow
     let glow = ctx.createRadialGradient(0,0,0,0,0,radius*2);
     glow.addColorStop(0, 'rgba(255,255,255,0.2)');
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
     ctx.beginPath(); ctx.arc(0,0,radius*2.5,0,Math.PI*2); ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.fill();
-
+    ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.1)"; ctx.fill();
     ctx.beginPath();
     for (let i = 0; i <= 180; i++) {
         const angle = (i - 90) * (Math.PI / 180);
@@ -145,9 +144,7 @@ function drawMoon(x, y, radius) {
         const angle = (i - 90) * (Math.PI / 180);
         ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
     }
-    ctx.fillStyle = "#fffbe0";
-    ctx.shadowBlur = 20; ctx.shadowColor = "white";
-    ctx.fill();
+    ctx.fillStyle = "#fffbe0"; ctx.shadowBlur = 20; ctx.shadowColor = "white"; ctx.fill();
     ctx.restore();
 }
 
@@ -230,11 +227,15 @@ function update() {
     if (immortalTimer > 0) {
         immortalTimer--;
         if (immortalTimer === 0) { collectedLetters = []; updateWordUI(); statusLabel.innerText = "Draak"; statusLabel.style.color = "#00ff41"; }
-        else { statusLabel.innerText = "✨ MAARTEN KRACHT! ✨"; statusLabel.style.color = "gold"; }
+        else { statusLabel.innerText = "✨ MAARTEN MODE ✨"; statusLabel.style.color = "gold"; }
     }
 
     let ground = canvas.height - 50;
-    dragon.dy += dragon.grav; dragon.y += dragon.dy;
+    // Suggestion 1: SNAPPY PHYSICS
+    let fallGrav = dragon.dy > 0 ? dragon.grav * 1.6 : dragon.grav;
+    dragon.dy += fallGrav; 
+    dragon.y += dragon.dy;
+
     if (dragon.y + dragon.h > ground) { dragon.y = ground - dragon.h; dragon.dy = 0; dragon.grounded = true; dragon.jumpCount = 0; }
 
     if (boss.active) {
@@ -260,8 +261,7 @@ function update() {
         obstacles.push({ x: canvas.width, y: ground - (50 + gameLevel*4), w: 40, h: 50 + gameLevel*4, hp: 2 });
     }
 
-    // Parallax update
-    stars.forEach(s => s.x -= moveSpeed * s.p);
+    stars.forEach(s => { s.x -= moveSpeed * s.p; if(s.x < 0) s.x = canvas.width; });
     clouds.forEach(c => { c.x -= moveSpeed * c.speed; if(c.x + c.w < -100) c.x = canvas.width + 100; });
 
     if (frame % 350 === 0 && collectedLetters.length < targetWord.length) {
@@ -277,63 +277,77 @@ function update() {
         fruits.push({ x: canvas.width, y: ground - 120 - Math.random()*180, type: pick.t, color: pick.c });
     }
 
-    letterItems.forEach((l, i) => {
+    // SUGGESTION 2: BETTER ARRAY FILTERING (No flickering)
+    letterItems = letterItems.filter(l => {
         l.x -= moveSpeed;
         if (checkHit(dragon, {x:l.x, y:l.y-20, w:30, h:30})) {
             if (!collectedLetters.includes(l.idx)) collectedLetters.push(l.idx);
-            letterItems.splice(i, 1); updateWordUI();
-            spawnExplosion(dragon.x, dragon.y, "gold", 20);
+            updateWordUI(); spawnExplosion(dragon.x, dragon.y, "gold", 20);
             if (collectedLetters.length === targetWord.length) { immortalTimer = 1200; shakeAmount = 30; }
+            return false;
         }
-        if (l.x < -50) letterItems.splice(i, 1);
+        return l.x > -50;
     });
 
-    obstacles.forEach((o, i) => { 
+    obstacles = obstacles.filter(o => {
         o.x -= moveSpeed; 
         if (checkHit(dragon, o)) { 
-            if (immortalTimer > 0) { spawnExplosion(o.x, o.y, "#e94560"); obstacles.splice(i,1); } 
-            else if (isDino) { resetPowerUps(); spawnExplosion(o.x, o.y, "#8B4513"); obstacles.splice(i,1); } 
-            else gameOver(); 
+            if (immortalTimer > 0) { spawnExplosion(o.x, o.y, "#e94560"); return false; } 
+            else if (isDino) { resetPowerUps(); spawnExplosion(o.x, o.y, "#8B4513"); return false; } 
+            else { gameOver(); return true; }
         } 
+        return o.x > -100;
     });
 
-    fruits.forEach((f, i) => { 
+    fruits = fruits.filter(f => {
         f.x -= moveSpeed; 
         if (checkHit(dragon, {x:f.x, y:f.y, w:25, h:25})) { 
             if(f.type==='poison' && immortalTimer == 0) gameOver(); 
             if(f.type==='rare') score+=100; 
             applyFruit(f.type); 
-            fruits.splice(i,1); 
             score+=10; 
+            return false;
         } 
+        return f.x > -100;
     });
 
-    bossFlames.forEach((bf, i) => { 
+    bossFlames = bossFlames.filter(bf => {
         bf.x += bf.vx; 
         if (checkHit(dragon, {x: bf.x-bf.r, y: bf.y-bf.r, w: bf.r*2, h: bf.r*2})) { 
             if (immortalTimer > 0 || isDino) { 
                 if(isDino && immortalTimer==0) resetPowerUps(); 
-                bossFlames.splice(i,1); 
-            } else gameOver(); 
+                return false;
+            } else { gameOver(); return true; }
         } 
-        if (bf.x < -100) bossFlames.splice(i,1); 
+        return bf.x > -100;
     });
 
-    flames.forEach((fl, fi) => {
+    flames = flames.filter(fl => {
         if (fl.type === 'ball') {
             fl.x += 15;
-            obstacles.forEach((o, oi) => { if (fl.x > o.x && fl.x < o.x + o.w && fl.y > o.y && fl.y < o.y + o.h) { if(bulletSize > 1) o.hp=0; else o.hp--; flames.splice(fi,1); if (o.hp <= 0) { spawnExplosion(o.x, o.y, "#e94560"); obstacles.splice(oi,1); } } });
-            if (boss.active && fl.x > boss.x && fl.x < boss.x + boss.w && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1.2; flames.splice(fi,1); if(boss.hp <= 0) winBoss(); }
-            if (fl.x > canvas.width) flames.splice(fi, 1);
+            let hitObstacle = false;
+            obstacles.forEach(o => {
+                if (fl.x > o.x && fl.x < o.x + o.w && fl.y > o.y && fl.y < o.y + o.h) {
+                    if(bulletSize > 1) o.hp=0; else o.hp--;
+                    hitObstacle = true;
+                    if (o.hp <= 0) { spawnExplosion(o.x, o.y, "#e94560"); o.dead = true; }
+                }
+            });
+            obstacles = obstacles.filter(o => !o.dead);
+            if (boss.active && fl.x > boss.x && fl.x < boss.x + boss.w && fl.y > boss.y && fl.y < boss.y + boss.h) { 
+                boss.hp -= 1.2; shakeAmount = 5; hitObstacle = true; if(boss.hp <= 0) winBoss(); 
+            }
+            return !hitObstacle && fl.x < canvas.width;
         } else {
             fl.life--;
-            obstacles.forEach((o, oi) => { if (o.x < fl.x + fl.w && fl.y > o.y && fl.y < o.y + o.h) { spawnExplosion(o.x, o.y, "white", 5); obstacles.splice(oi,1); } });
+            obstacles.forEach(o => { if (o.x < fl.x + fl.w && fl.y > o.y && fl.y < o.y + o.h) { spawnExplosion(o.x, o.y, "white", 5); o.dead = true; } });
+            obstacles = obstacles.filter(o => !o.dead);
             if (boss.active && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1; if(boss.hp <= 0) winBoss(); }
-            if (fl.life <= 0) flames.splice(fi,1);
+            return fl.life > 0;
         }
     });
     
-    particles.forEach((p, i) => { p.x += p.vx; p.y += p.vy; p.life--; if (p.life <= 0) particles.splice(i, 1); });
+    particles = particles.filter(p => { p.x += p.vx; p.y += p.vy; p.life--; return p.life > 0; });
     scoreElement.innerText = score;
 }
 
@@ -349,16 +363,22 @@ function applyFruit(type) {
 
 function resetPowerUps() { speedMult = 1; bulletSize = 1; isDino = false; hasLaser = false; dragon.size = 1; if(immortalTimer == 0) { statusLabel.innerText = "Draak"; statusLabel.style.color = "#00ff41"; } }
 function winBoss() { spawnExplosion(boss.x+60, boss.y+60, "purple", 50); boss.active = false; gameLevel++; score += 500; shakeAmount = 35; }
-function checkHit(d, o) { let dW = d.w * d.size, dH = d.h * d.size; return d.x < o.x + (o.w||25) && d.x + dW > o.x && d.y < o.y + (o.h||25) && d.y + dH > o.y; }
+
+// SUGGESTION 3: PADDED COLLISION (FAIRER FEEL)
+function checkHit(d, o) { 
+    let pad = 8;
+    let dW = (d.w * d.size) - pad, dH = (d.h * d.size) - pad; 
+    return d.x + (pad/2) < o.x + (o.w||25) && d.x + (pad/2) + dW > o.x && d.y + (pad/2) < o.y + (o.h||25) && d.y + (pad/2) + dH > o.y; 
+}
 
 function draw() {
     ctx.fillStyle = getSkyGradient();
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    if (timeMode === "night" || timeMode === "sunset") {
-        ctx.fillStyle = "white";
-        stars.forEach(s => { if(s.x < 0) s.x = canvas.width; ctx.fillRect(s.x, s.y, s.s, s.s); });
-        drawMoon(canvas.width - 120, 100, 40);
+    if (timeMode === "night" || timeMode === "sunset" || immortalTimer > 0) {
+        ctx.fillStyle = immortalTimer > 0 ? `hsl(${(frame*20)%360}, 100%, 80%)` : "white";
+        stars.forEach(s => { ctx.fillRect(s.x, s.y, s.s, s.s); });
+        if (immortalTimer === 0) drawMoon(canvas.width - 120, 100, 40);
     }
     if (timeMode === "day" || timeMode === "sunrise") {
         ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
@@ -368,7 +388,6 @@ function draw() {
     ctx.save(); 
     if (shakeAmount > 0) { ctx.translate(Math.random()*shakeAmount - shakeAmount/2, Math.random()*shakeAmount - shakeAmount/2); shakeAmount *= 0.9; }
     
-    // Ground
     ctx.fillStyle = "#222"; ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
     ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 50, canvas.width, 4);
 
