@@ -12,43 +12,60 @@
         
         #ui { position: absolute; top: 10px; left: 10px; color: white; pointer-events: none; z-index: 10; font-size: 14px; width: 95%; text-shadow: 1px 1px 2px black; }
         #wordDisplay { font-size: 24px; font-weight: bold; margin-bottom: 5px; letter-spacing: 5px; }
-        .letter-off { color: rgba(255,255,255,0.2); }
-        .letter-on { color: #f9ed69; text-shadow: 0 0 10px #f9ed69; }
+        .letter-off { color: rgba(255,255,255,0.15); }
+        .letter-on { color: #f9ed69; text-shadow: 0 0 15px #f9ed69; }
         
-        #bossMeterContainer { width: 150px; height: 12px; background: rgba(255,255,255,0.2); border: 2px solid white; margin-top: 5px; border-radius: 5px; }
+        #bossMeterContainer { width: 150px; height: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.5); margin-top: 5px; border-radius: 5px; overflow: hidden; }
         #bossMeterFill { height: 100%; width: 0%; background: #ff4500; transition: width 0.2s; }
         
-        .btn { position: absolute; bottom: 20px; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.2); border: 3px solid white; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; z-index: 20; user-select: none; }
-        #jumpBtn { left: 20px; }
-        #fireBtn { right: 20px; border-color: #ff4500; color: #ff4500; }
+        .btn { position: absolute; bottom: 25px; width: 85px; height: 85px; background: rgba(255, 255, 255, 0.1); border: 4px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; z-index: 20; user-select: none; font-size: 12px; backdrop-filter: blur(4px); }
+        #jumpBtn { left: 25px; }
+        #fireBtn { right: 25px; border-color: #ff4500; color: #ff4500; }
+        .btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
         
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 20px; }
-        h1 { color: #00ff41; text-shadow: 0 0 10px #00ff41; font-size: 2.2em; margin: 0; }
-        button { padding: 10px 25px; font-size: 18px; cursor: pointer; background: #00ff41; border: none; border-radius: 5px; font-weight: bold; margin-top: 15px; font-family: inherit; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 20px; backdrop-filter: blur(5px); }
+        h1 { color: #00ff41; text-shadow: 0 0 15px #00ff41; font-size: 2.5em; margin: 0; letter-spacing: 3px; }
+        button { padding: 12px 35px; font-size: 20px; cursor: pointer; background: #00ff41; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; font-family: inherit; transition: 0.2s; }
+        button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,255,65,0.4); }
+        .legend { font-size: 11px; text-align: left; margin-top: 15px; line-height: 1.6; color: #ddd; max-width: 450px; background: rgba(255,255,255,0.08); padding: 15px; border-radius: 8px; border-left: 4px solid #00ff41; }
+        .score-item { display: flex; justify-content: space-between; width: 240px; font-size: 13px; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        #initialsInput { background: black; border: 2px solid #00ff41; color: #00ff41; font-size: 22px; text-align: center; width: 90px; text-transform: uppercase; outline: none; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div id="landscapeMsg"><h2>🔄 Draai je telefoon!</h2><p>Speel in landscape modus.</p></div>
+    <div id="landscapeMsg"><h2>🔄 Draai je telefoon!</h2><p>Dragon Rush speel je liggend voor de beste ervaring.</p></div>
 
     <div id="startScreen" class="overlay">
         <h1>DRAGON RUSH</h1>
-        <h3>by Jip & Noah</h3>
-        <p>Pak alle letters van <b>MAARTEN</b> voor Onsterfelijkheid!</p>
-        <button id="realStartBtn">START</button>
+        <h3 style="margin: 5px 0;">Jip & Noah Edition</h3>
+        <p id="timeGreeting" style="color: #00e5ff; font-weight: bold;"></p>
+        <div class="legend">
+            🔵 <b>Cyaan:</b> Snelheid + 2x Score | 🟠 <b>Oranje:</b> Laser (als Dino)<br>
+            🟣 <b>Paars:</b> T-Rex Mode (Extra leven) | ⚪ <b>Wit:</b> Slow motion<br>
+            🌈 <b>Regenboog:</b> +100 PTN | 🟢 <b>Groen:</b> <b>GIFTIG!</b><br>
+            ✨ <b>Woord "MAARTEN":</b> Onsterfelijkheid!
+        </div>
+        <button id="realStartBtn">START GAME</button>
     </div>
 
     <div id="gameOverScreen" class="overlay" style="display: none;">
         <h1>GAME OVER</h1>
-        <p>Score: <span id="finalScore">0</span></p>
-        <button id="retryBtn">OPNIEUW</button>
+        <p style="font-size: 24px;">Score: <span id="finalScore" style="color:#00ff41;">0</span></p>
+        <div id="nameInputContainer" style="display:none; margin: 10px 0;">
+            <p style="color: gold;">NIEUWE HIGHSCORE! Je initialen:</p>
+            <input type="text" id="initialsInput" maxlength="3" placeholder="AAA">
+            <button id="saveScoreBtn">OPSLAAN</button>
+        </div>
+        <div id="highScoreList" style="margin: 15px 0;"></div>
+        <button id="retryBtn">PROBEER OPNIEUW</button>
     </div>
 
     <div id="ui">
         <div id="wordDisplay"></div>
-        <strong>Jip & Noah</strong> | Score: <span id="score">0</span><br>
+        <div style="margin-bottom: 5px;">Score: <span id="score" style="color:#00ff41; font-weight:bold;">0</span></div>
         <span id="bossLabel">Boss Afstand:</span>
         <div id="bossMeterContainer"><div id="bossMeterFill"></div></div>
-        <span id="statusLabel" style="font-weight:bold; color:#00ff41;">Draak</span>
+        <div id="statusLabel" style="margin-top:5px; font-weight:bold; color:#00ff41; font-size:18px;">Draak</div>
     </div>
     
     <div id="jumpBtn" class="btn">SPRONG</div>
@@ -58,20 +75,81 @@
 <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const scoreElement = document.getElementById('score'), bossMeterFill = document.getElementById('bossMeterFill');
-const statusLabel = document.getElementById('statusLabel'), wordDisplay = document.getElementById('wordDisplay');
+const scoreElement = document.getElementById('score'), bossLabel = document.getElementById('bossLabel');
+const bossMeterFill = document.getElementById('bossMeterFill'), finalScoreElement = document.getElementById('finalScore');
+const statusLabel = document.getElementById('statusLabel'), highScoreList = document.getElementById('highScoreList');
+const wordDisplay = document.getElementById('wordDisplay'), initialsInput = document.getElementById('initialsInput');
 
+// TIME & THEME LOGIC
+const hour = new Date().getHours();
+let timeMode = "day";
+let greeting = "Klaar voor de start?";
+if (hour >= 22 || hour < 6) { timeMode = "night"; greeting = "Goedenacht! Nachtbonus Actief (1.2x)!"; }
+else if (hour >= 6 && hour < 10) { timeMode = "sunrise"; greeting = "Goedemorgen, vroege vogel!"; }
+else if (hour >= 18 && hour < 22) { timeMode = "sunset"; greeting = "Goedenavond!"; }
+document.getElementById('timeGreeting').innerText = greeting;
+
+let score, gameActive, frame, shakeAmount, animationId, particles = [];
+let speedMult, bulletSize, isDino, powerUpTimer, hasLaser, gameLevel;
+let dragon, obstacles, fruits, flames, bossFlames, boss, letterItems, stars = [], clouds = [];
+let collectedLetters = [], immortalTimer = 0;
 const targetWord = "MAARTEN";
 const bossThreshold = 800;
 
-let score, gameActive, frame, shakeAmount, animationId;
-let speedMult, bulletSize, isDino, powerUpTimer, hasLaser, gameLevel, nextBossScore;
-let dragon, obstacles, fruits, flames, bossFlames, boss, letterItems;
-let collectedLetters = [], immortalTimer = 0;
+let highScores = JSON.parse(localStorage.getItem('dragonRushScores')) || [{name: "JIP", score: 1200}, {name: "NOA", score: 1100}];
 
-function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+function resize() { 
+    canvas.width = window.innerWidth; 
+    canvas.height = window.innerHeight; 
+    stars = []; clouds = [];
+    for(let i=0; i<70; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, p: Math.random()*0.1});
+    for(let i=0; i<6; i++) clouds.push({x: Math.random()*canvas.width, y: Math.random()*180, w: 90+Math.random()*100, speed: 0.2 + Math.random()*0.3});
+}
 window.addEventListener('resize', resize);
 resize();
+
+function getSkyGradient() {
+    let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    if (timeMode === "night") { grad.addColorStop(0, "#020205"); grad.addColorStop(1, "#0f0c29"); }
+    else if (timeMode === "sunrise") { grad.addColorStop(0, "#ff5f6d"); grad.addColorStop(1, "#ffc371"); }
+    else if (timeMode === "sunset") { grad.addColorStop(0, "#2c3e50"); grad.addColorStop(1, "#000000"); }
+    else { grad.addColorStop(0, "#4facfe"); grad.addColorStop(1, "#00f2fe"); }
+    return grad;
+}
+
+function drawMoon(x, y, radius) {
+    const day = new Date().getDate();
+    const phase = (day % 30) / 30; 
+    ctx.save();
+    ctx.translate(x, y);
+    
+    // Moon Glow
+    let glow = ctx.createRadialGradient(0,0,0,0,0,radius*2);
+    glow.addColorStop(0, 'rgba(255,255,255,0.2)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(0,0,radius*2.5,0,Math.PI*2); ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.fill();
+
+    ctx.beginPath();
+    for (let i = 0; i <= 180; i++) {
+        const angle = (i - 90) * (Math.PI / 180);
+        const illumination = Math.cos(2 * Math.PI * phase);
+        ctx.lineTo(Math.cos(angle) * radius * illumination, Math.sin(angle) * radius);
+    }
+    for (let i = 180; i >= 0; i--) {
+        const angle = (i - 90) * (Math.PI / 180);
+        ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    }
+    ctx.fillStyle = "#fffbe0";
+    ctx.shadowBlur = 20; ctx.shadowColor = "white";
+    ctx.fill();
+    ctx.restore();
+}
 
 function updateWordUI() {
     wordDisplay.innerHTML = targetWord.split('').map((l, i) => 
@@ -81,24 +159,35 @@ function updateWordUI() {
 
 function drawPlayer(x, y, size, dino) {
     ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
-    ctx.fillStyle = (immortalTimer > 0) ? `hsl(${frame * 10}, 100%, 50%)` : (dino ? "#8B4513" : "#00ff41");
-    if (dino) {
-        ctx.fillRect(10, 5, 25, 20); ctx.fillRect(10, 22, 10, 15); ctx.fillRect(-10, 25, 25, 10); // T-Rex
-        ctx.fillStyle = "white"; ctx.fillRect(28, 8, 4, 4);
+    if (immortalTimer > 0) {
+        ctx.fillStyle = `hsl(${frame * 15}, 100%, 60%)`;
+        ctx.shadowBlur = 15; ctx.shadowColor = "white";
     } else {
-        ctx.fillRect(5, 10, 25, 15); ctx.fillRect(20, 2, 18, 12); // Draak lichaam + kop
-        ctx.fillStyle = (immortalTimer > 0) ? "white" : "#008f11";
-        ctx.fillRect(0, 5, 15, 10); ctx.fillStyle = "white"; ctx.fillRect(30, 5, 4, 4); // Oog
+        ctx.fillStyle = dino ? "#8B4513" : "#00ff41";
+    }
+    
+    if (dino) {
+        ctx.fillRect(10, 5, 30, 25); ctx.fillRect(10, 25, 12, 18); ctx.fillRect(-10, 30, 30, 10);
+        ctx.fillStyle = "white"; ctx.fillRect(32, 10, 5, 5); ctx.fillStyle = "black"; ctx.fillRect(35, 12, 2, 2);
+        if (immortalTimer == 0) ctx.fillStyle = "#5D2E0A";
+        ctx.fillRect(5, 45, 8, 15); ctx.fillRect(20, 45, 8, 15);
+    } else {
+        ctx.fillRect(5, 10, 25, 15); ctx.fillRect(20, 2, 20, 15);
+        if (immortalTimer == 0) ctx.fillStyle = "#008f11";
+        ctx.fillRect(0, 5, 18, 12); ctx.fillStyle = "white"; ctx.fillRect(32, 6, 5, 5);
+        ctx.fillStyle = "#ffcc00"; ctx.fillRect(22, -4, 5, 8); ctx.fillRect(30, -4, 5, 8);
     }
     ctx.restore();
 }
 
 function drawHydra(x, y) {
-    ctx.save(); ctx.translate(x, y); ctx.fillStyle = "#a349a4"; ctx.fillRect(20, 60, 60, 50);
+    ctx.save(); ctx.translate(x, y); 
+    ctx.shadowBlur = 15; ctx.shadowColor = "purple";
+    ctx.fillStyle = "#a349a4"; ctx.fillRect(20, 60, 60, 50);
     for (let i = 0; i < 3; i++) {
-        let ox = i * 28; let oy = Math.sin(frame * 0.1 + i) * 12;
-        ctx.fillRect(ox, 20 + oy, 15, 45); ctx.fillRect(ox - 5, 10 + oy, 30, 18);
-        ctx.fillStyle = "yellow"; ctx.fillRect(ox + 15, 15 + oy, 5, 5);
+        let ox = i * 28; let oy = Math.sin(frame * 0.15 + i) * 15;
+        ctx.fillRect(ox, 20 + oy, 15, 45); ctx.fillRect(ox - 5, 10 + oy, 35, 20);
+        ctx.fillStyle = "yellow"; ctx.fillRect(ox + 18, 15 + oy, 6, 6);
     }
     ctx.restore();
 }
@@ -106,118 +195,254 @@ function drawHydra(x, y) {
 function initVariables() {
     score = 0; gameActive = true; frame = 0; shakeAmount = 0;
     speedMult = 1; bulletSize = 1; isDino = false; powerUpTimer = 0; hasLaser = false; gameLevel = 1;
-    nextBossScore = bossThreshold;
-    dragon = { x: 60, y: 0, w: 40, h: 45, dy: 0, grav: 0.5, grounded: false, size: 1, jumpCount: 0, maxJumps: 3 };
-    obstacles = []; fruits = []; flames = []; bossFlames = []; letterItems = []; 
-    collectedLetters = []; immortalTimer = 0;
-    boss = { active: false, x: canvas.width - 150, y: 50, w: 120, h: 120, hp: 30, maxHp: 30, dir: 1 };
+    dragon = { x: 80, y: 0, w: 45, h: 50, dy: 0, grav: 0.6, grounded: false, size: 1, jumpCount: 0, maxJumps: 3 };
+    obstacles = []; fruits = []; flames = []; bossFlames = []; particles = []; 
+    letterItems = []; collectedLetters = []; immortalTimer = 0;
+    boss = { active: false, x: canvas.width - 160, y: 50, w: 130, h: 130, hp: 30, maxHp: 30, dir: 1 };
     updateWordUI();
 }
 
-function handleJump() { if (gameActive && dragon.jumpCount < dragon.maxJumps) { dragon.dy = isDino ? -13 : -11; dragon.jumpCount++; dragon.grounded = false; } }
+function spawnExplosion(x, y, color, amount = 12) {
+    for (let i = 0; i < amount; i++) particles.push({ x, y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, life: 30, color, size: Math.random()*6+2 });
+}
+
+function handleJump() { if (gameActive && dragon.jumpCount < dragon.maxJumps) { dragon.dy = isDino ? -14 : -12; dragon.jumpCount++; dragon.grounded = false; } }
 function handleFire() {
     if (!gameActive) return;
-    if (hasLaser && isDino) { flames.push({ x: dragon.x + 45, y: dragon.y + 15, w: canvas.width, h: 25, type: 'laser', life: 12 }); shakeAmount = 10; }
-    else if (dragon.size > 0.4 || isDino) { flames.push({ x: dragon.x + 40, y: dragon.y + 20, r: 10 * bulletSize, type: 'ball' }); if (!isDino) dragon.size -= 0.04; }
+    if (hasLaser && isDino) { flames.push({ x: dragon.x + 50, y: dragon.y + 15, w: canvas.width, h: 30, type: 'laser', life: 15 }); shakeAmount = 15; }
+    else if (dragon.size > 0.4 || isDino) { flames.push({ x: dragon.x + 50, y: dragon.y + 25, r: 12 * bulletSize, type: 'ball' }); if (!isDino) dragon.size -= 0.04; }
 }
 
-window.onkeydown = (e) => { if(e.code === 'Space') handleJump(); if(e.code === 'KeyF') handleFire(); };
+window.onkeydown = (e) => { if(e.code === 'Space') handleJump(); if(e.code === 'KeyF' || e.code === 'Enter') handleFire(); };
 document.getElementById('jumpBtn').ontouchstart = (e) => { e.preventDefault(); handleJump(); };
 document.getElementById('fireBtn').ontouchstart = (e) => { e.preventDefault(); handleFire(); };
-
-function applyFruit(type) {
-    let oldDino = isDino; resetPowerUps(); isDino = oldDino;
-    if (type === 'speed') { speedMult = 1.7; statusLabel.innerText = "Snelheid!"; }
-    else if (type === 'big') { if(isDino) hasLaser = true; else bulletSize = 3; statusLabel.innerText = "Mega Vuur!"; }
-    else if (type === 'dino') { isDino = true; statusLabel.innerText = "T-REX MODE"; powerUpTimer = 9999; return; }
-    else if (type === 'slow') { speedMult = 0.5; statusLabel.innerText = "Slow-mo"; }
-    powerUpTimer = 400;
-}
-
-function resetPowerUps() { speedMult = 1; bulletSize = 1; isDino = false; hasLaser = false; dragon.size = 1; statusLabel.innerText = "Draak"; }
 
 function update() {
     if (!gameActive) return;
     frame++;
-    if (frame % 60 === 0) score += (speedMult > 1) ? 2 : 1;
+    
+    if (frame % 60 === 0) {
+        let pts = (speedMult > 1) ? 2 : 1;
+        score += (timeMode === "night") ? Math.ceil(pts * 1.2) : pts;
+    }
+
     if (powerUpTimer > 0) { powerUpTimer--; if (powerUpTimer === 0) resetPowerUps(); }
-    if (immortalTimer > 0) { immortalTimer--; if (immortalTimer === 0) { collectedLetters = []; updateWordUI(); statusLabel.innerText = "Draak"; } }
+    if (immortalTimer > 0) {
+        immortalTimer--;
+        if (immortalTimer === 0) { collectedLetters = []; updateWordUI(); statusLabel.innerText = "Draak"; statusLabel.style.color = "#00ff41"; }
+        else { statusLabel.innerText = "✨ MAARTEN KRACHT! ✨"; statusLabel.style.color = "gold"; }
+    }
 
     let ground = canvas.height - 50;
     dragon.dy += dragon.grav; dragon.y += dragon.dy;
     if (dragon.y + dragon.h > ground) { dragon.y = ground - dragon.h; dragon.dy = 0; dragon.grounded = true; dragon.jumpCount = 0; }
 
     if (boss.active) {
+        bossLabel.innerText = "HYDRA HP:";
         bossMeterFill.style.width = (boss.hp / boss.maxHp * 100) + "%";
-        boss.y += (4 * boss.dir); if (boss.y < 20 || boss.y > ground - 160) boss.dir *= -1;
-        if (frame % 60 === 0) bossFlames.push({ x: boss.x, y: boss.y+50, r: 15, vx: -10 });
+        bossMeterFill.style.backgroundColor = "#00ff41";
     } else {
+        bossLabel.innerText = "Boss Aankomst:";
         bossMeterFill.style.width = ((score % bossThreshold) / bossThreshold * 100) + "%";
-        if (score >= nextBossScore) { boss.active = true; boss.hp = 30 * gameLevel; boss.maxHp = boss.hp; nextBossScore += bossThreshold; obstacles = []; shakeAmount = 20; }
+        bossMeterFill.style.backgroundColor = "#ff4500";
     }
 
-    let moveSpeed = (7 + gameLevel) * speedMult;
-    if (!boss.active && frame % 80 === 0) obstacles.push({ x: canvas.width, y: ground - 45, w: 35, h: 45 });
+    let moveSpeed = (8 + (gameLevel * 1.5)) * speedMult;
+    if (score > 0 && score % bossThreshold === 0 && !boss.active) { boss.active = true; boss.hp = 30 * gameLevel; boss.maxHp = boss.hp; obstacles = []; shakeAmount = 20; }
+    
+    if (boss.active) {
+        boss.y += (4.5 * boss.dir); if (boss.y < 30 || boss.y > ground - 170) boss.dir *= -1;
+        if (frame % 55 === 0) {
+            let roll = Math.random() > 0.5;
+            bossFlames.push({ x: boss.x, y: roll ? ground-35 : boss.y+60, r: 18, vx: -(moveSpeed+4), roll: roll });
+        }
+    } else if (frame % 70 === 0) {
+        obstacles.push({ x: canvas.width, y: ground - (50 + gameLevel*4), w: 40, h: 50 + gameLevel*4, hp: 2 });
+    }
 
-    obstacles.forEach((o, i) => { o.x -= moveSpeed; if (checkHit(dragon, o)) { if (immortalTimer > 0 || isDino) obstacles.splice(i,1); else gameOver(); } });
+    // Parallax update
+    stars.forEach(s => s.x -= moveSpeed * s.p);
+    clouds.forEach(c => { c.x -= moveSpeed * c.speed; if(c.x + c.w < -100) c.x = canvas.width + 100; });
+
+    if (frame % 350 === 0 && collectedLetters.length < targetWord.length) {
+        let needed = []; for (let i=0; i<targetWord.length; i++) if (!collectedLetters.includes(i)) needed.push(i);
+        let idx = needed[Math.floor(Math.random() * needed.length)];
+        letterItems.push({ x: canvas.width, y: 150 + Math.random() * 150, char: targetWord[idx], idx });
+    }
 
     if (frame % 120 === 0) {
-        let types = [{c:'cyan',t:'speed'},{c:'orange',t:'big'},{c:'purple',t:'dino'},{c:'white',t:'slow'}];
-        let p = types[Math.floor(Math.random()*types.length)];
-        fruits.push({ x: canvas.width, y: ground - 120, type: p.t, color: p.c });
+        let types = [{c:'cyan',t:'speed'},{c:'orange',t:'big'},{c:'purple',t:'dino'},{c:'white',t:'slow'},{c:'green',t:'poison'}];
+        if (Math.random() < 0.15) types.push({c:'rainbow',t:'rare'});
+        let pick = types[Math.floor(Math.random()*types.length)];
+        fruits.push({ x: canvas.width, y: ground - 120 - Math.random()*180, type: pick.t, color: pick.c });
     }
-    fruits.forEach((f, i) => { f.x -= moveSpeed; if (checkHit(dragon, {x:f.x, y:f.y, w:25, h:25})) { applyFruit(f.type); fruits.splice(i,1); } });
 
-    flames.forEach((fl, fi) => {
-        if (fl.type === 'ball') {
-            fl.x += 12;
-            if (boss.active && fl.x > boss.x && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1; flames.splice(fi,1); if(boss.hp <= 0) { boss.active = false; score += 300; gameLevel++; } }
-            obstacles.forEach((o, oi) => { if (fl.x > o.x && fl.x < o.x + o.w && fl.y > o.y) { obstacles.splice(oi,1); flames.splice(fi,1); }});
-        } else { fl.life--; if (boss.active && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 0.5; if(boss.hp <= 0) { boss.active = false; score += 300; gameLevel++; } } if (fl.life <= 0) flames.splice(fi,1); }
-    });
-
-    if (frame % 300 === 0 && collectedLetters.length < 7) {
-        let needed = []; for(let i=0; i<7; i++) if(!collectedLetters.includes(i)) needed.push(i);
-        let idx = needed[Math.floor(Math.random()*needed.length)];
-        letterItems.push({ x: canvas.width, y: 100+Math.random()*200, char: targetWord[idx], idx });
-    }
     letterItems.forEach((l, i) => {
         l.x -= moveSpeed;
         if (checkHit(dragon, {x:l.x, y:l.y-20, w:30, h:30})) {
-            if(!collectedLetters.includes(l.idx)) collectedLetters.push(l.idx);
+            if (!collectedLetters.includes(l.idx)) collectedLetters.push(l.idx);
             letterItems.splice(i, 1); updateWordUI();
-            if(collectedLetters.length === 7) { immortalTimer = 1200; statusLabel.innerText = "MAARTEN MODUS!"; }
+            spawnExplosion(dragon.x, dragon.y, "gold", 20);
+            if (collectedLetters.length === targetWord.length) { immortalTimer = 1200; shakeAmount = 30; }
+        }
+        if (l.x < -50) letterItems.splice(i, 1);
+    });
+
+    obstacles.forEach((o, i) => { 
+        o.x -= moveSpeed; 
+        if (checkHit(dragon, o)) { 
+            if (immortalTimer > 0) { spawnExplosion(o.x, o.y, "#e94560"); obstacles.splice(i,1); } 
+            else if (isDino) { resetPowerUps(); spawnExplosion(o.x, o.y, "#8B4513"); obstacles.splice(i,1); } 
+            else gameOver(); 
+        } 
+    });
+
+    fruits.forEach((f, i) => { 
+        f.x -= moveSpeed; 
+        if (checkHit(dragon, {x:f.x, y:f.y, w:25, h:25})) { 
+            if(f.type==='poison' && immortalTimer == 0) gameOver(); 
+            if(f.type==='rare') score+=100; 
+            applyFruit(f.type); 
+            fruits.splice(i,1); 
+            score+=10; 
+        } 
+    });
+
+    bossFlames.forEach((bf, i) => { 
+        bf.x += bf.vx; 
+        if (checkHit(dragon, {x: bf.x-bf.r, y: bf.y-bf.r, w: bf.r*2, h: bf.r*2})) { 
+            if (immortalTimer > 0 || isDino) { 
+                if(isDino && immortalTimer==0) resetPowerUps(); 
+                bossFlames.splice(i,1); 
+            } else gameOver(); 
+        } 
+        if (bf.x < -100) bossFlames.splice(i,1); 
+    });
+
+    flames.forEach((fl, fi) => {
+        if (fl.type === 'ball') {
+            fl.x += 15;
+            obstacles.forEach((o, oi) => { if (fl.x > o.x && fl.x < o.x + o.w && fl.y > o.y && fl.y < o.y + o.h) { if(bulletSize > 1) o.hp=0; else o.hp--; flames.splice(fi,1); if (o.hp <= 0) { spawnExplosion(o.x, o.y, "#e94560"); obstacles.splice(oi,1); } } });
+            if (boss.active && fl.x > boss.x && fl.x < boss.x + boss.w && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1.2; flames.splice(fi,1); if(boss.hp <= 0) winBoss(); }
+            if (fl.x > canvas.width) flames.splice(fi, 1);
+        } else {
+            fl.life--;
+            obstacles.forEach((o, oi) => { if (o.x < fl.x + fl.w && fl.y > o.y && fl.y < o.y + o.h) { spawnExplosion(o.x, o.y, "white", 5); obstacles.splice(oi,1); } });
+            if (boss.active && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1; if(boss.hp <= 0) winBoss(); }
+            if (fl.life <= 0) flames.splice(fi,1);
         }
     });
-    bossFlames.forEach((bf, i) => { bf.x += bf.vx; if (checkHit(dragon, {x: bf.x-10, y: bf.y-10, w: 20, h: 20})) { if (immortalTimer > 0 || isDino) bossFlames.splice(i,1); else gameOver(); } });
+    
+    particles.forEach((p, i) => { p.x += p.vx; p.y += p.vy; p.life--; if (p.life <= 0) particles.splice(i, 1); });
     scoreElement.innerText = score;
 }
 
+function applyFruit(type) {
+    if(type === 'rare' || type === 'poison') return;
+    let oldDino = isDino; resetPowerUps(); isDino = oldDino;
+    if (type === 'speed') speedMult = 1.8;
+    else if (type === 'big') { if(isDino) hasLaser = true; else bulletSize = 3.5; }
+    else if (type === 'dino') { isDino = true; statusLabel.innerText = "T-REX MODE"; statusLabel.style.color = "#8B4513"; powerUpTimer = 9999; return; }
+    else if (type === 'slow') speedMult = 0.5;
+    powerUpTimer = 450;
+}
+
+function resetPowerUps() { speedMult = 1; bulletSize = 1; isDino = false; hasLaser = false; dragon.size = 1; if(immortalTimer == 0) { statusLabel.innerText = "Draak"; statusLabel.style.color = "#00ff41"; } }
+function winBoss() { spawnExplosion(boss.x+60, boss.y+60, "purple", 50); boss.active = false; gameLevel++; score += 500; shakeAmount = 35; }
 function checkHit(d, o) { let dW = d.w * d.size, dH = d.h * d.size; return d.x < o.x + (o.w||25) && d.x + dW > o.x && d.y < o.y + (o.h||25) && d.y + dH > o.y; }
 
 function draw() {
-    ctx.fillStyle = "#1a1a2e"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    if (shakeAmount > 0) { ctx.translate(Math.random()*shakeAmount, Math.random()*shakeAmount); shakeAmount *= 0.9; }
+    ctx.fillStyle = getSkyGradient();
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 50, canvas.width, 50); // Grond
+    if (timeMode === "night" || timeMode === "sunset") {
+        ctx.fillStyle = "white";
+        stars.forEach(s => { if(s.x < 0) s.x = canvas.width; ctx.fillRect(s.x, s.y, s.s, s.s); });
+        drawMoon(canvas.width - 120, 100, 40);
+    }
+    if (timeMode === "day" || timeMode === "sunrise") {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        clouds.forEach(c => { ctx.beginPath(); ctx.ellipse(c.x, c.y, c.w/2, 25, 0, 0, 7); ctx.fill(); });
+    }
+
+    ctx.save(); 
+    if (shakeAmount > 0) { ctx.translate(Math.random()*shakeAmount - shakeAmount/2, Math.random()*shakeAmount - shakeAmount/2); shakeAmount *= 0.9; }
+    
+    // Ground
+    ctx.fillStyle = "#222"; ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+    ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 50, canvas.width, 4);
+
     drawPlayer(dragon.x, dragon.y, dragon.size, isDino);
     if (boss.active) drawHydra(boss.x, boss.y);
     
-    ctx.fillStyle = "#ff2e63"; obstacles.forEach(o => ctx.fillRect(o.x, o.y, o.w, o.h));
-    fruits.forEach(f => { ctx.fillStyle = f.color; ctx.beginPath(); ctx.arc(f.x+15, f.y+15, 12, 0, 7); ctx.fill(); });
-    ctx.fillStyle = "white"; flames.forEach(fl => { if(fl.type=='ball') { ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r, 0, 7); ctx.fill(); } else { ctx.fillStyle="cyan"; ctx.fillRect(fl.x, fl.y, fl.w, fl.h); } });
-    ctx.fillStyle = "red"; bossFlames.forEach(bf => { ctx.beginPath(); ctx.arc(bf.x, bf.y, bf.r, 0, 7); ctx.fill(); });
-    ctx.fillStyle = "gold"; letterItems.forEach(l => { ctx.font = "bold 30px Courier"; ctx.fillText(l.char, l.x, l.y); });
+    obstacles.forEach(o => { 
+        ctx.fillStyle = (o.hp==1) ? "#555" : "#ff2e63"; 
+        ctx.fillRect(o.x, o.y, o.w, o.h); 
+        if(o.hp==1) { ctx.strokeStyle="white"; ctx.strokeRect(o.x+3, o.y+3, o.w-6, o.h-6); } 
+    });
+
+    fruits.forEach(f => { 
+        ctx.fillStyle = f.type==='rare' ? `hsl(${(frame*10)%360},100%,50%)` : f.color; 
+        ctx.beginPath(); ctx.arc(f.x+15, f.y+15, 14, 0, 7); ctx.fill(); 
+        ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(f.x+10, f.y+10, 4, 0, 7); ctx.fill(); 
+    });
+
+    letterItems.forEach(l => { 
+        ctx.fillStyle = "gold"; ctx.font = "bold 32px Courier"; 
+        ctx.shadowBlur = 15; ctx.shadowColor = "gold";
+        ctx.fillText(l.char, l.x, l.y); 
+        ctx.shadowBlur = 0;
+    });
+
+    flames.forEach(fl => { 
+        if (fl.type === 'ball') { 
+            ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r, 0, 7); ctx.fill(); 
+        } else { 
+            ctx.fillStyle = "white"; ctx.shadowBlur=20; ctx.shadowColor="cyan"; ctx.fillRect(fl.x, fl.y, fl.w, fl.h); 
+        } 
+    });
+
+    particles.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life/30; ctx.fillRect(p.x, p.y, p.size, p.size); });
+    ctx.globalAlpha = 1; 
     
+    bossFlames.forEach(bf => { 
+        ctx.fillStyle = "#ff416c"; ctx.beginPath(); ctx.arc(bf.x, bf.y, bf.r, 0, 7); ctx.fill(); 
+        if(bf.roll) { ctx.fillStyle="white"; ctx.fillRect(bf.x-bf.r, bf.y-3, bf.r*2, 6); } 
+    });
     ctx.restore();
 }
 
-function gameOver() { gameActive = false; document.getElementById('finalScore').innerText = score; document.getElementById('gameOverScreen').style.display='flex'; }
-function startGame() { document.getElementById('startScreen').style.display='none'; document.getElementById('gameOverScreen').style.display='none'; initVariables(); loop(); }
+function gameOver() { 
+    gameActive = false; finalScoreElement.innerText = score; 
+    document.getElementById('gameOverScreen').style.display='flex';
+    const min = highScores.length < 10 ? 0 : highScores[highScores.length-1].score;
+    document.getElementById('nameInputContainer').style.display = score > min ? 'block' : 'none';
+    updateHighScoreDisplay();
+}
 
+function updateHighScoreDisplay() {
+    highScoreList.innerHTML = '<div style="color:#888; font-size:11px; margin-bottom:5px;">TOP 10 HALL OF FAME</div>';
+    highScores.slice(0, 10).forEach((s, i) => { highScoreList.innerHTML += `<div class="score-item"><span>${i+1}. ${s.name}</span><span>${s.score}</span></div>`; });
+}
+
+document.getElementById('saveScoreBtn').onclick = () => {
+    const name = initialsInput.value.toUpperCase() || "???";
+    highScores.push({name, score});
+    highScores.sort((a,b)=>b.score-a.score); highScores = highScores.slice(0,10);
+    localStorage.setItem('dragonRushScores', JSON.stringify(highScores));
+    document.getElementById('nameInputContainer').style.display='none';
+    updateHighScoreDisplay();
+};
+
+function startGame() { 
+    document.getElementById('startScreen').style.display='none'; 
+    document.getElementById('gameOverScreen').style.display='none'; 
+    initVariables(); 
+    loop(); 
+}
 document.getElementById('realStartBtn').onclick = startGame;
 document.getElementById('retryBtn').onclick = startGame;
+
 function loop() { if(gameActive) { update(); draw(); animationId = requestAnimationFrame(loop); } }
 </script>
 </body>
