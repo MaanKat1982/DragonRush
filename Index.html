@@ -26,20 +26,20 @@
         .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 15px; backdrop-filter: blur(5px); }
         h1 { color: #00ff41; text-shadow: 0 0 15px #00ff41; font-size: 2.2em; margin: 0; letter-spacing: 3px; }
         
-        /* GAME OVER SPECIFIEKE STIJL */
-        #gameOverScreen { display: none; }
+        /* HALL OF FAME 2 KOLOMMEN */
         #highScoreList { 
             margin: 5px 0; 
-            max-height: 100px; 
-            overflow-y: auto; 
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Twee gelijke kolommen */
+            grid-gap: 5px 15px;
             width: 100%; 
-            max-width: 280px;
+            max-width: 340px;
             background: rgba(255,255,255,0.05);
-            padding: 8px;
+            padding: 10px;
             border-radius: 8px;
             border: 1px solid rgba(0,255,65,0.2);
         }
-        .score-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .score-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
         
         #nameInputContainer {
             background: rgba(255,215,0,0.15);
@@ -75,7 +75,7 @@
         <button id="realStartBtn">START GAME</button>
     </div>
 
-    <div id="gameOverScreen" class="overlay">
+    <div id="gameOverScreen" class="overlay" style="display: none;">
         <h1>GAME OVER</h1>
         <p style="font-size: 18px; margin: 5px 0;">Score: <span id="finalScore" style="color:#00ff41;">0</span></p>
         
@@ -85,6 +85,7 @@
             <button id="saveScoreBtn">OK</button>
         </div>
 
+        <div style="color:#888; font-size:10px; margin-bottom:2px; font-weight:bold;">HALL OF FAME</div>
         <div id="highScoreList"></div>
         <button id="retryBtn">OPNIEUW</button>
     </div>
@@ -254,7 +255,6 @@ function update() {
     }
 
     let ground = canvas.height - 50;
-    // Verbeterde Snappy Physics
     let fallGrav = dragon.dy > 0 ? dragon.grav * 1.6 : dragon.grav;
     dragon.dy += fallGrav; dragon.y += dragon.dy;
     if (dragon.y + dragon.h > ground) { dragon.y = ground - dragon.h; dragon.dy = 0; dragon.grounded = true; dragon.jumpCount = 0; }
@@ -298,7 +298,6 @@ function update() {
         fruits.push({ x: canvas.width, y: ground - 120 - Math.random()*180, type: pick.t, color: pick.c });
     }
 
-    // Geoptimaliseerde array filtering (tegen flickering)
     letterItems = letterItems.filter(l => {
         l.x -= moveSpeed;
         if (checkHit(dragon, {x:l.x, y:l.y-20, w:30, h:30})) {
@@ -415,8 +414,10 @@ function gameOver() {
 }
 
 function updateHighScoreDisplay() {
-    highScoreList.innerHTML = '<div style="color:#888; font-size:10px; margin-bottom:5px;">TOP 10 HALL OF FAME</div>';
-    highScores.slice(0, 10).forEach((s, i) => { highScoreList.innerHTML += `<div class="score-item"><span>${i+1}. ${s.name}</span><span>${s.score}</span></div>`; });
+    highScoreList.innerHTML = '';
+    highScores.slice(0, 10).forEach((s, i) => { 
+        highScoreList.innerHTML += `<div class="score-item"><span>${i+1}.${s.name}</span><span>${s.score}</span></div>`; 
+    });
 }
 
 document.getElementById('saveScoreBtn').onclick = () => {
