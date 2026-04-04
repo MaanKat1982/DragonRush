@@ -18,46 +18,75 @@
         #bossMeterContainer { width: 150px; height: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.5); margin-top: 5px; border-radius: 5px; overflow: hidden; }
         #bossMeterFill { height: 100%; width: 0%; background: #ff4500; transition: width 0.2s; }
         
-        .btn { position: absolute; bottom: 25px; width: 85px; height: 85px; background: rgba(255, 255, 255, 0.1); border: 4px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; z-index: 20; user-select: none; font-size: 12px; backdrop-filter: blur(4px); }
-        #jumpBtn { left: 25px; }
-        #fireBtn { right: 25px; border-color: #ff4500; color: #ff4500; }
+        .btn { position: absolute; bottom: 20px; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.1); border: 4px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; z-index: 20; user-select: none; font-size: 12px; backdrop-filter: blur(4px); }
+        #jumpBtn { left: 20px; }
+        #fireBtn { right: 20px; border-color: #ff4500; color: #ff4500; }
         .btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
         
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 20px; backdrop-filter: blur(5px); }
-        h1 { color: #00ff41; text-shadow: 0 0 15px #00ff41; font-size: 2.5em; margin: 0; letter-spacing: 3px; }
-        button { padding: 12px 35px; font-size: 20px; cursor: pointer; background: #00ff41; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; font-family: inherit; transition: 0.2s; }
-        button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,255,65,0.4); }
-        .legend { font-size: 11px; text-align: left; margin-top: 15px; line-height: 1.6; color: #ddd; max-width: 450px; background: rgba(255,255,255,0.08); padding: 15px; border-radius: 8px; border-left: 4px solid #00ff41; }
-        .score-item { display: flex; justify-content: space-between; width: 240px; font-size: 13px; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        #initialsInput { background: black; border: 2px solid #00ff41; color: #00ff41; font-size: 22px; text-align: center; width: 90px; text-transform: uppercase; outline: none; border-radius: 4px; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 15px; backdrop-filter: blur(5px); }
+        h1 { color: #00ff41; text-shadow: 0 0 15px #00ff41; font-size: 2.2em; margin: 0; letter-spacing: 3px; }
+        
+        /* GAME OVER SPECIFIEKE STIJL */
+        #gameOverScreen { display: none; }
+        #highScoreList { 
+            margin: 5px 0; 
+            max-height: 100px; 
+            overflow-y: auto; 
+            width: 100%; 
+            max-width: 280px;
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,255,65,0.2);
+        }
+        .score-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
+        #nameInputContainer {
+            background: rgba(255,215,0,0.15);
+            padding: 8px;
+            border-radius: 8px;
+            margin: 5px 0;
+            border: 1px solid gold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #initialsInput { background: black; border: 2px solid gold; color: gold; font-size: 18px; text-align: center; width: 60px; text-transform: uppercase; outline: none; }
+        
+        button { padding: 10px 25px; font-size: 18px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; font-family: inherit; transition: 0.2s; }
+        #realStartBtn { background: #00ff41; color: black; margin-top: 15px; }
+        #saveScoreBtn { background: gold; color: black; padding: 5px 15px; }
+        #retryBtn { background: #ff2e63; color: white; margin-top: 10px; width: 180px; }
+        
+        .legend { font-size: 10px; text-align: left; margin-top: 10px; line-height: 1.4; color: #ddd; max-width: 400px; background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; border-left: 4px solid #00ff41; }
     </style>
 </head>
 <body>
-    <div id="landscapeMsg"><h2>🔄 Draai je telefoon!</h2><p>Dragon Rush speel je liggend voor de beste ervaring.</p></div>
+    <div id="landscapeMsg"><h2>🔄 Draai je telefoon!</h2><p>Dragon Rush speel je liggend.</p></div>
 
     <div id="startScreen" class="overlay">
         <h1>DRAGON RUSH</h1>
-        <h3 style="margin: 5px 0;">Jip & Noah Edition</h3>
-        <p id="timeGreeting" style="color: #00e5ff; font-weight: bold;"></p>
+        <h3 style="margin: 5px 0; font-size: 14px;">Jip & Noah Edition</h3>
+        <p id="timeGreeting" style="color: #00e5ff; font-weight: bold; font-size: 12px; margin: 5px 0;"></p>
         <div class="legend">
-            🔵 <b>Cyaan:</b> Snelheid + 2x Score | 🟠 <b>Oranje:</b> Laser (als Dino)<br>
-            🟣 <b>Paars:</b> T-Rex Mode (Extra leven) | ⚪ <b>Wit:</b> Slow motion<br>
-            🌈 <b>Regenboog:</b> +100 PTN | 🟢 <b>Groen:</b> <b>GIFTIG!</b><br>
-            ✨ <b>Woord "MAARTEN":</b> Onsterfelijkheid & Disco!
+            🔵 Snelheid | 🟠 Laser | 🟣 T-Rex | ⚪ Slowmo<br>
+            🌈 +100 PTN | 🟢 <b>GIFTIG!</b> | ✨ <b>"MAARTEN":</b> DISCO MODE!
         </div>
         <button id="realStartBtn">START GAME</button>
     </div>
 
-    <div id="gameOverScreen" class="overlay" style="display: none;">
+    <div id="gameOverScreen" class="overlay">
         <h1>GAME OVER</h1>
-        <p style="font-size: 24px;">Score: <span id="finalScore" style="color:#00ff41;">0</span></p>
-        <div id="nameInputContainer" style="display:none; margin: 10px 0;">
-            <p style="color: gold;">NIEUWE HIGHSCORE! Je initialen:</p>
-            <input type="text" id="initialsInput" maxlength="3" placeholder="AAA">
-            <button id="saveScoreBtn">OPSLAAN</button>
+        <p style="font-size: 18px; margin: 5px 0;">Score: <span id="finalScore" style="color:#00ff41;">0</span></p>
+        
+        <div id="nameInputContainer" style="display:none;">
+            <span style="color: gold; font-size: 11px; font-weight: bold;">TOP SCORE!</span>
+            <input type="text" id="initialsInput" maxlength="3" placeholder="JIP">
+            <button id="saveScoreBtn">OK</button>
         </div>
-        <div id="highScoreList" style="margin: 15px 0;"></div>
-        <button id="retryBtn">PROBEER OPNIEUW</button>
+
+        <div id="highScoreList"></div>
+        <button id="retryBtn">OPNIEUW</button>
     </div>
 
     <div id="ui">
@@ -65,7 +94,7 @@
         <div style="margin-bottom: 5px;">Score: <span id="score" style="color:#00ff41; font-weight:bold;">0</span></div>
         <span id="bossLabel">Boss Afstand:</span>
         <div id="bossMeterContainer"><div id="bossMeterFill"></div></div>
-        <div id="statusLabel" style="margin-top:5px; font-weight:bold; color:#00ff41; font-size:18px;">Draak</div>
+        <div id="statusLabel" style="margin-top:5px; font-weight:bold; color:#00ff41; font-size:16px;">Draak</div>
     </div>
     
     <div id="jumpBtn" class="btn">SPRONG</div>
@@ -83,8 +112,8 @@ const wordDisplay = document.getElementById('wordDisplay'), initialsInput = docu
 const hour = new Date().getHours();
 let timeMode = "day";
 let greeting = "Klaar voor de start?";
-if (hour >= 22 || hour < 6) { timeMode = "night"; greeting = "Goedenacht! Nachtbonus Actief (1.2x)!"; }
-else if (hour >= 6 && hour < 10) { timeMode = "sunrise"; greeting = "Goedemorgen, vroege vogel!"; }
+if (hour >= 22 || hour < 6) { timeMode = "night"; greeting = "Nachtbonus Actief (1.2x)!"; }
+else if (hour >= 6 && hour < 10) { timeMode = "sunrise"; greeting = "Goedemorgen!"; }
 else if (hour >= 18 && hour < 22) { timeMode = "sunset"; greeting = "Goedenavond!"; }
 document.getElementById('timeGreeting').innerText = greeting;
 
@@ -110,7 +139,7 @@ resize();
 function getSkyGradient() {
     if (immortalTimer > 0) {
         let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        grad.addColorStop(0, `hsl(${(frame*5)%360}, 70%, 20%)`);
+        grad.addColorStop(0, `hsl(${(frame*10)%360}, 70%, 20%)`);
         grad.addColorStop(1, "#000");
         return grad;
     }
@@ -125,13 +154,10 @@ function getSkyGradient() {
 function drawMoon(x, y, radius) {
     const day = new Date().getDate();
     const phase = (day % 30) / 30; 
-    ctx.save();
-    ctx.translate(x, y);
+    ctx.save(); ctx.translate(x, y);
     let glow = ctx.createRadialGradient(0,0,0,0,0,radius*2);
-    glow.addColorStop(0, 'rgba(255,255,255,0.2)');
-    glow.addColorStop(1, 'transparent');
-    ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(0,0,radius*2.5,0,Math.PI*2); ctx.fill();
+    glow.addColorStop(0, 'rgba(255,255,255,0.2)'); glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(0,0,radius*2.5,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(255, 255, 255, 0.1)"; ctx.fill();
     ctx.beginPath();
@@ -144,8 +170,7 @@ function drawMoon(x, y, radius) {
         const angle = (i - 90) * (Math.PI / 180);
         ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
     }
-    ctx.fillStyle = "#fffbe0"; ctx.shadowBlur = 20; ctx.shadowColor = "white"; ctx.fill();
-    ctx.restore();
+    ctx.fillStyle = "#fffbe0"; ctx.shadowBlur = 20; ctx.shadowColor = "white"; ctx.fill(); ctx.restore();
 }
 
 function updateWordUI() {
@@ -162,7 +187,6 @@ function drawPlayer(x, y, size, dino) {
     } else {
         ctx.fillStyle = dino ? "#8B4513" : "#00ff41";
     }
-    
     if (dino) {
         ctx.fillRect(10, 5, 30, 25); ctx.fillRect(10, 25, 12, 18); ctx.fillRect(-10, 30, 30, 10);
         ctx.fillStyle = "white"; ctx.fillRect(32, 10, 5, 5); ctx.fillStyle = "black"; ctx.fillRect(35, 12, 2, 2);
@@ -217,7 +241,6 @@ document.getElementById('fireBtn').ontouchstart = (e) => { e.preventDefault(); h
 function update() {
     if (!gameActive) return;
     frame++;
-    
     if (frame % 60 === 0) {
         let pts = (speedMult > 1) ? 2 : 1;
         score += (timeMode === "night") ? Math.ceil(pts * 1.2) : pts;
@@ -231,11 +254,9 @@ function update() {
     }
 
     let ground = canvas.height - 50;
-    // Suggestion 1: SNAPPY PHYSICS
+    // Verbeterde Snappy Physics
     let fallGrav = dragon.dy > 0 ? dragon.grav * 1.6 : dragon.grav;
-    dragon.dy += fallGrav; 
-    dragon.y += dragon.dy;
-
+    dragon.dy += fallGrav; dragon.y += dragon.dy;
     if (dragon.y + dragon.h > ground) { dragon.y = ground - dragon.h; dragon.dy = 0; dragon.grounded = true; dragon.jumpCount = 0; }
 
     if (boss.active) {
@@ -277,7 +298,7 @@ function update() {
         fruits.push({ x: canvas.width, y: ground - 120 - Math.random()*180, type: pick.t, color: pick.c });
     }
 
-    // SUGGESTION 2: BETTER ARRAY FILTERING (No flickering)
+    // Geoptimaliseerde array filtering (tegen flickering)
     letterItems = letterItems.filter(l => {
         l.x -= moveSpeed;
         if (checkHit(dragon, {x:l.x, y:l.y-20, w:30, h:30})) {
@@ -304,9 +325,7 @@ function update() {
         if (checkHit(dragon, {x:f.x, y:f.y, w:25, h:25})) { 
             if(f.type==='poison' && immortalTimer == 0) gameOver(); 
             if(f.type==='rare') score+=100; 
-            applyFruit(f.type); 
-            score+=10; 
-            return false;
+            applyFruit(f.type); score+=10; return false;
         } 
         return f.x > -100;
     });
@@ -314,33 +333,26 @@ function update() {
     bossFlames = bossFlames.filter(bf => {
         bf.x += bf.vx; 
         if (checkHit(dragon, {x: bf.x-bf.r, y: bf.y-bf.r, w: bf.r*2, h: bf.r*2})) { 
-            if (immortalTimer > 0 || isDino) { 
-                if(isDino && immortalTimer==0) resetPowerUps(); 
-                return false;
-            } else { gameOver(); return true; }
+            if (immortalTimer > 0 || isDino) { if(isDino && immortalTimer==0) resetPowerUps(); return false; } 
+            else { gameOver(); return true; }
         } 
         return bf.x > -100;
     });
 
     flames = flames.filter(fl => {
         if (fl.type === 'ball') {
-            fl.x += 15;
-            let hitObstacle = false;
+            fl.x += 15; let hitObstacle = false;
             obstacles.forEach(o => {
                 if (fl.x > o.x && fl.x < o.x + o.w && fl.y > o.y && fl.y < o.y + o.h) {
-                    if(bulletSize > 1) o.hp=0; else o.hp--;
-                    hitObstacle = true;
+                    if(bulletSize > 1) o.hp=0; else o.hp--; hitObstacle = true;
                     if (o.hp <= 0) { spawnExplosion(o.x, o.y, "#e94560"); o.dead = true; }
                 }
             });
             obstacles = obstacles.filter(o => !o.dead);
-            if (boss.active && fl.x > boss.x && fl.x < boss.x + boss.w && fl.y > boss.y && fl.y < boss.y + boss.h) { 
-                boss.hp -= 1.2; shakeAmount = 5; hitObstacle = true; if(boss.hp <= 0) winBoss(); 
-            }
+            if (boss.active && fl.x > boss.x && fl.x < boss.x + boss.w && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1.2; hitObstacle = true; if(boss.hp <= 0) winBoss(); }
             return !hitObstacle && fl.x < canvas.width;
         } else {
-            fl.life--;
-            obstacles.forEach(o => { if (o.x < fl.x + fl.w && fl.y > o.y && fl.y < o.y + o.h) { spawnExplosion(o.x, o.y, "white", 5); o.dead = true; } });
+            fl.life--; obstacles.forEach(o => { if (o.x < fl.x + fl.w && fl.y > o.y && fl.y < o.y + o.h) { spawnExplosion(o.x, o.y, "white", 5); o.dead = true; } });
             obstacles = obstacles.filter(o => !o.dead);
             if (boss.active && fl.y > boss.y && fl.y < boss.y + boss.h) { boss.hp -= 1; if(boss.hp <= 0) winBoss(); }
             return fl.life > 0;
@@ -364,17 +376,13 @@ function applyFruit(type) {
 function resetPowerUps() { speedMult = 1; bulletSize = 1; isDino = false; hasLaser = false; dragon.size = 1; if(immortalTimer == 0) { statusLabel.innerText = "Draak"; statusLabel.style.color = "#00ff41"; } }
 function winBoss() { spawnExplosion(boss.x+60, boss.y+60, "purple", 50); boss.active = false; gameLevel++; score += 500; shakeAmount = 35; }
 
-// SUGGESTION 3: PADDED COLLISION (FAIRER FEEL)
 function checkHit(d, o) { 
-    let pad = 8;
-    let dW = (d.w * d.size) - pad, dH = (d.h * d.size) - pad; 
+    let pad = 10; let dW = (d.w * d.size) - pad, dH = (d.h * d.size) - pad; 
     return d.x + (pad/2) < o.x + (o.w||25) && d.x + (pad/2) + dW > o.x && d.y + (pad/2) < o.y + (o.h||25) && d.y + (pad/2) + dH > o.y; 
 }
 
 function draw() {
-    ctx.fillStyle = getSkyGradient();
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+    ctx.fillStyle = getSkyGradient(); ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (timeMode === "night" || timeMode === "sunset" || immortalTimer > 0) {
         ctx.fillStyle = immortalTimer > 0 ? `hsl(${(frame*20)%360}, 100%, 80%)` : "white";
         stars.forEach(s => { ctx.fillRect(s.x, s.y, s.s, s.s); });
@@ -384,80 +392,43 @@ function draw() {
         ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         clouds.forEach(c => { ctx.beginPath(); ctx.ellipse(c.x, c.y, c.w/2, 25, 0, 0, 7); ctx.fill(); });
     }
-
-    ctx.save(); 
-    if (shakeAmount > 0) { ctx.translate(Math.random()*shakeAmount - shakeAmount/2, Math.random()*shakeAmount - shakeAmount/2); shakeAmount *= 0.9; }
-    
+    ctx.save(); if (shakeAmount > 0) { ctx.translate(Math.random()*shakeAmount - shakeAmount/2, Math.random()*shakeAmount - shakeAmount/2); shakeAmount *= 0.9; }
     ctx.fillStyle = "#222"; ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
     ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 50, canvas.width, 4);
-
     drawPlayer(dragon.x, dragon.y, dragon.size, isDino);
     if (boss.active) drawHydra(boss.x, boss.y);
-    
-    obstacles.forEach(o => { 
-        ctx.fillStyle = (o.hp==1) ? "#555" : "#ff2e63"; 
-        ctx.fillRect(o.x, o.y, o.w, o.h); 
-        if(o.hp==1) { ctx.strokeStyle="white"; ctx.strokeRect(o.x+3, o.y+3, o.w-6, o.h-6); } 
-    });
-
-    fruits.forEach(f => { 
-        ctx.fillStyle = f.type==='rare' ? `hsl(${(frame*10)%360},100%,50%)` : f.color; 
-        ctx.beginPath(); ctx.arc(f.x+15, f.y+15, 14, 0, 7); ctx.fill(); 
-        ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(f.x+10, f.y+10, 4, 0, 7); ctx.fill(); 
-    });
-
-    letterItems.forEach(l => { 
-        ctx.fillStyle = "gold"; ctx.font = "bold 32px Courier"; 
-        ctx.shadowBlur = 15; ctx.shadowColor = "gold";
-        ctx.fillText(l.char, l.x, l.y); 
-        ctx.shadowBlur = 0;
-    });
-
-    flames.forEach(fl => { 
-        if (fl.type === 'ball') { 
-            ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r, 0, 7); ctx.fill(); 
-        } else { 
-            ctx.fillStyle = "white"; ctx.shadowBlur=20; ctx.shadowColor="cyan"; ctx.fillRect(fl.x, fl.y, fl.w, fl.h); 
-        } 
-    });
-
+    obstacles.forEach(o => { ctx.fillStyle = (o.hp==1) ? "#555" : "#ff2e63"; ctx.fillRect(o.x, o.y, o.w, o.h); });
+    fruits.forEach(f => { ctx.fillStyle = f.type==='rare' ? `hsl(${(frame*10)%360},100%,50%)` : f.color; ctx.beginPath(); ctx.arc(f.x+15, f.y+15, 14, 0, 7); ctx.fill(); });
+    letterItems.forEach(l => { ctx.fillStyle = "gold"; ctx.font = "bold 32px Courier"; ctx.shadowBlur = 15; ctx.shadowColor = "gold"; ctx.fillText(l.char, l.x, l.y); ctx.shadowBlur = 0; });
+    flames.forEach(fl => { if (fl.type === 'ball') { ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(fl.x, fl.y, fl.r, 0, 7); ctx.fill(); } else { ctx.fillStyle = "white"; ctx.shadowBlur=20; ctx.shadowColor="cyan"; ctx.fillRect(fl.x, fl.y, fl.w, fl.h); } });
     particles.forEach(p => { ctx.fillStyle = p.color; ctx.globalAlpha = p.life/30; ctx.fillRect(p.x, p.y, p.size, p.size); });
-    ctx.globalAlpha = 1; 
-    
-    bossFlames.forEach(bf => { 
-        ctx.fillStyle = "#ff416c"; ctx.beginPath(); ctx.arc(bf.x, bf.y, bf.r, 0, 7); ctx.fill(); 
-        if(bf.roll) { ctx.fillStyle="white"; ctx.fillRect(bf.x-bf.r, bf.y-3, bf.r*2, 6); } 
-    });
+    ctx.globalAlpha = 1; bossFlames.forEach(bf => { ctx.fillStyle = "#ff416c"; ctx.beginPath(); ctx.arc(bf.x, bf.y, bf.r, 0, 7); ctx.fill(); });
     ctx.restore();
 }
 
 function gameOver() { 
     gameActive = false; finalScoreElement.innerText = score; 
     document.getElementById('gameOverScreen').style.display='flex';
-    const min = highScores.length < 10 ? 0 : highScores[highScores.length-1].score;
-    document.getElementById('nameInputContainer').style.display = score > min ? 'block' : 'none';
+    const minScore = highScores.length < 10 ? 0 : highScores[highScores.length-1].score;
+    document.getElementById('nameInputContainer').style.display = score > minScore ? 'flex' : 'none';
     updateHighScoreDisplay();
 }
 
 function updateHighScoreDisplay() {
-    highScoreList.innerHTML = '<div style="color:#888; font-size:11px; margin-bottom:5px;">TOP 10 HALL OF FAME</div>';
+    highScoreList.innerHTML = '<div style="color:#888; font-size:10px; margin-bottom:5px;">TOP 10 HALL OF FAME</div>';
     highScores.slice(0, 10).forEach((s, i) => { highScoreList.innerHTML += `<div class="score-item"><span>${i+1}. ${s.name}</span><span>${s.score}</span></div>`; });
 }
 
 document.getElementById('saveScoreBtn').onclick = () => {
     const name = initialsInput.value.toUpperCase() || "???";
-    highScores.push({name, score});
-    highScores.sort((a,b)=>b.score-a.score); highScores = highScores.slice(0,10);
-    localStorage.setItem('dragonRushScores', JSON.stringify(highScores));
-    document.getElementById('nameInputContainer').style.display='none';
-    updateHighScoreDisplay();
+    highScores.push({name, score}); highScores.sort((a,b)=>b.score-a.score);
+    highScores = highScores.slice(0,10); localStorage.setItem('dragonRushScores', JSON.stringify(highScores));
+    document.getElementById('nameInputContainer').style.display='none'; updateHighScoreDisplay();
 };
 
 function startGame() { 
-    document.getElementById('startScreen').style.display='none'; 
-    document.getElementById('gameOverScreen').style.display='none'; 
-    initVariables(); 
-    loop(); 
+    document.getElementById('startScreen').style.display='none'; document.getElementById('gameOverScreen').style.display='none'; 
+    initVariables(); loop(); 
 }
 document.getElementById('realStartBtn').onclick = startGame;
 document.getElementById('retryBtn').onclick = startGame;
