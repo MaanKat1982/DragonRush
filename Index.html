@@ -7,7 +7,37 @@
     <style>
         body { margin: 0; overflow: hidden; background: #1a1a2e; font-family: 'Courier New', Courier, monospace; touch-action: none; }
         canvas { display: block; }
-        #landscapeMsg { display: none; position: absolute; inset: 0; background: #1a1a2e; color: white; z-index: 500; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        
+        /* Intro Screen - Vult het hele scherm met de afbeelding */
+        #introScreen {
+            position: absolute;
+            inset: 0;
+            z-index: 1000;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        #introScreen img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Zorgt dat de afbeelding volledig zichtbaar is zonder vervorming */
+            max-height: 1200px;
+        }
+        #clickPrompt {
+            position: absolute;
+            bottom: 30px;
+            color: white;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: blink 1.5s infinite;
+            text-shadow: 2px 2px 4px black;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        #landscapeMsg { display: none; position: absolute; inset: 0; background: #1a1a2e; color: white; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
         @media (orientation: portrait) { #landscapeMsg { display: flex; } }
         
         #ui { position: absolute; top: 10px; left: 10px; color: white; pointer-events: none; z-index: 10; font-size: 14px; width: 95%; text-shadow: 1px 1px 2px black; }
@@ -21,35 +51,14 @@
         .btn { position: absolute; bottom: 20px; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.1); border: 4px solid rgba(255,255,255,0.6); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; z-index: 20; user-select: none; font-size: 12px; backdrop-filter: blur(4px); }
         #jumpBtn { left: 20px; }
         #fireBtn { right: 20px; border-color: #ff4500; color: #ff4500; }
-        .btn:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
         
         .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 100; text-align: center; padding: 15px; backdrop-filter: blur(5px); overflow-y: auto; }
         h1 { color: #00ff41; text-shadow: 0 0 15px #00ff41; font-size: 2.2em; margin: 10px 0; letter-spacing: 3px; }
         
-        #highScoreList { 
-            margin: 5px 0; 
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 5px 15px;
-            width: 100%; 
-            max-width: 340px;
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(0,255,65,0.2);
-        }
+        #highScoreList { margin: 5px 0; display: grid; grid-template-columns: 1fr 1fr; grid-gap: 5px 15px; width: 100%; max-width: 340px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,65,0.2); }
         .score-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
         
-        #nameInputContainer {
-            background: rgba(255,215,0,0.15);
-            padding: 8px;
-            border-radius: 8px;
-            margin: 5px 0;
-            border: 1px solid gold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        #nameInputContainer { background: rgba(255,215,0,0.15); padding: 8px; border-radius: 8px; margin: 5px 0; border: 1px solid gold; display: flex; align-items: center; gap: 10px; }
         #initialsInput { background: black; border: 2px solid gold; color: gold; font-size: 18px; text-align: center; width: 60px; text-transform: uppercase; outline: none; }
         
         button { padding: 10px 25px; font-size: 18px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; font-family: inherit; transition: 0.2s; }
@@ -58,28 +67,21 @@
         #retryBtn { background: #ff2e63; color: white; margin-top: 10px; width: 180px; }
         
         .legend { font-size: 10px; text-align: left; margin-top: 10px; line-height: 1.4; color: #ddd; max-width: 400px; background: rgba(255,255,255,0.08); padding: 10px; border-radius: 8px; border-left: 4px solid #00ff41; }
-        
         .pc-controls { margin-top: 10px; display: flex; gap: 20px; font-size: 11px; color: #00ff41; }
         .key { border: 1px solid #00ff41; padding: 2px 6px; border-radius: 4px; background: rgba(0,255,65,0.1); }
-
-        /* Splash Image Styling */
-        #startImage { 
-            max-width: 90vw; 
-            max-height: 1200px; 
-            height: auto; 
-            width: auto;
-            border-radius: 10px; 
-            border: 2px solid #00ff41; 
-            box-shadow: 0 0 20px rgba(0,255,65,0.3);
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
+    <!-- Splash Intro -->
+    <div id="introScreen" onclick="showMenu()">
+        <img src="Splash.jpeg" alt="Dragon Rush Intro">
+        <div id="clickPrompt">Tik om te starten</div>
+    </div>
+
     <div id="landscapeMsg"><h2>🔄 Draai je telefoon!</h2><p>Dragon Rush speel je liggend.</p></div>
 
-    <div id="startScreen" class="overlay">
-        <img src="Splash.jpeg" id="startImage" alt="Dragon Rush">
+    <!-- Main Menu -->
+    <div id="startScreen" class="overlay" style="display: none;">
         <h1>DRAGON RUSH</h1>
         <h3 style="margin: 0; font-size: 14px;">Jip § Noah Edition</h3>
         <p id="timeGreeting" style="color: #00e5ff; font-weight: bold; font-size: 12px; margin: 10px 0;"></p>
@@ -93,19 +95,18 @@
             🔵 Snelheid | 🟠 Laser | 🟣 T-Rex | ⚪ Slowmo<br>
             🌈 +100 PTN | 🟢 <b>GIFTIG!</b> | ✨ <b>"MAARTEN":</b> DISCO MODE!
         </div>
-        <button id="realStartBtn">START GAME</button>
+        <button id="realStartBtn">NAAR STARTPUNT</button>
     </div>
 
+    <!-- Game Over Screen -->
     <div id="gameOverScreen" class="overlay" style="display: none;">
         <h1>GAME OVER</h1>
         <p style="font-size: 18px; margin: 5px 0;">Score: <span id="finalScore" style="color:#00ff41;">0</span></p>
-        
         <div id="nameInputContainer" style="display:none;">
             <span style="color: gold; font-size: 11px; font-weight: bold;">TOP SCORE!</span>
             <input type="text" id="initialsInput" maxlength="3" placeholder="JIP">
             <button id="saveScoreBtn">OK</button>
         </div>
-
         <div style="color:#888; font-size:10px; margin-bottom:2px; font-weight:bold;">HALL OF FAME</div>
         <div id="highScoreList"></div>
         <button id="retryBtn">OPNIEUW</button>
@@ -126,10 +127,17 @@
 <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const introScreen = document.getElementById('introScreen');
+const startScreen = document.getElementById('startScreen');
 const scoreElement = document.getElementById('score'), bossLabel = document.getElementById('bossLabel');
 const bossMeterFill = document.getElementById('bossMeterFill'), finalScoreElement = document.getElementById('finalScore');
 const statusLabel = document.getElementById('statusLabel'), highScoreList = document.getElementById('highScoreList');
 const wordDisplay = document.getElementById('wordDisplay'), initialsInput = document.getElementById('initialsInput');
+
+function showMenu() {
+    introScreen.style.display = 'none';
+    startScreen.style.display = 'flex';
+}
 
 const hour = new Date().getHours();
 let timeMode = "day";
@@ -139,7 +147,7 @@ else if (hour >= 6 && hour < 10) { timeMode = "sunrise"; greeting = "Goedemorgen
 else if (hour >= 18 && hour < 22) { timeMode = "sunset"; greeting = "Goedenavond!"; }
 document.getElementById('timeGreeting').innerText = greeting;
 
-let score, gameActive, frame, shakeAmount, animationId, particles = [];
+let score, gameActive = false, frame, shakeAmount, animationId, particles = [];
 let speedMult, bulletSize, isDino, powerUpTimer, hasLaser, gameLevel;
 let dragon, obstacles, fruits, flames, bossFlames, boss, letterItems, stars = [], clouds = [];
 let collectedLetters = [], immortalTimer = 0;
@@ -190,7 +198,6 @@ function drawMoon(x, y, radius) {
     }
     for (let i = 180; i >= 0; i--) {
         const angle = (i - 90) * (Math.PI / 180);
-        const illumination = Math.cos(2 * Math.PI * phase);
         ctx.lineTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
     }
     ctx.fillStyle = "#fffbe0"; ctx.shadowBlur = 20; ctx.shadowColor = "white"; ctx.fill(); ctx.restore();
@@ -450,9 +457,7 @@ function updateHighScoreDisplay() {
     });
 }
 
-initialsInput.onkeydown = (e) => {
-    if (e.key === 'Enter') document.getElementById('saveScoreBtn').click();
-};
+initialsInput.onkeydown = (e) => { if (e.key === 'Enter') document.getElementById('saveScoreBtn').click(); };
 
 document.getElementById('saveScoreBtn').onclick = () => {
     const name = initialsInput.value.toUpperCase() || "???";
@@ -462,7 +467,7 @@ document.getElementById('saveScoreBtn').onclick = () => {
 };
 
 function startGame() { 
-    document.getElementById('startScreen').style.display='none'; document.getElementById('gameOverScreen').style.display='none'; 
+    startScreen.style.display='none'; document.getElementById('gameOverScreen').style.display='none'; 
     initVariables(); loop(); 
 }
 document.getElementById('realStartBtn').onclick = startGame;
